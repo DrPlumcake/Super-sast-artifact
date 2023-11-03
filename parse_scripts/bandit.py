@@ -97,9 +97,7 @@ def only_json(log):
         
         log_fd.truncate(0)
         log_fd.seek(0)
-        log_fd.writelines(lines[enum:-1])
-        # the last line had a lot of white space, don't know why
-        log_fd.write(lines[-1].strip())
+        log_fd.writelines(lines[enum:])
 
 def bandit_parse(log):
     only_json(log)
