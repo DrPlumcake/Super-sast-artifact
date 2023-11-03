@@ -21,5 +21,9 @@ jobs:
       run: |
         docker run --name super-sast-artifact  -v $PWD:/code -e M2_HOME=/code -e HOME=/code -e RUN_ALL_TOOLS=false -e RUN_BANDIT=true -w /code super-sast-action:0.3.4
 
-    - name: Container info
-      run: docker ps
+    - uses: actions/upload-artifact@v3
+      with:
+        name: super-sast-artifact
+        path: |
+          super-sast.log
+          log_dir/
