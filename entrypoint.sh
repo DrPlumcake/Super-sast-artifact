@@ -16,6 +16,10 @@ echo "Running bandit with: " ${BANDIT_CONFIG} -r "${INPUT_PROJECT_PATH}" -o "${G
 bandit ${BANDIT_CONFIG} -r "${INPUT_PROJECT_PATH}" -o "${GITHUB_WORKSPACE}/output/security_report.txt" -f 'txt'
 BANDIT_STATUS="$?"
 
+echo "output of filesystem structure:\n"
+ls -lah
+ls -lah log_dir/
+
 GITHUB_TOKEN=$INPUT_REPO_TOKEN python /main.py 
 
 if [ "$?" -eq 0 ]; then
