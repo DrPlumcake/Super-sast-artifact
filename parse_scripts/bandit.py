@@ -90,11 +90,15 @@ def only_json(log):
             line = log_fd.readline()
         log_fd.seek(0)
         lines = log_fd.readlines()
+        
+        # In case if json file without indentation, remove [enum:] from lines
         #lines_without_newlines = [line.strip() for line in lines[enum:]]
-        #lines_form = ''.join(lines_without_newlines)
+        #lines = ''.join(lines_without_newlines)
+        
         log_fd.truncate(0)
         log_fd.seek(0)
         log_fd.writelines(lines[enum:-1])
+        # the last line had a lot of white space, don't know why
         log_fd.write(lines[-1].strip())
 
 def bandit_parse(log):
