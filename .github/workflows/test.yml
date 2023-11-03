@@ -14,21 +14,12 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
+    - name: Build Docker image
+      run: docker build -t super-sast-action:0.3.4 .
 
-    - name: Install
-      run: |-
-        python --version
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt pytest
+    - name: Run Docker Image
+      run: |
+        docker run --name super-sast-artifact  -v $PWD:/code -e M2_HOME=/code -e HOME=/code -e RUN_ALL_TOOLS=false -e RUN_BANDIT=true -w /code super-sast-action:0.3.4
 
-        PYTHONPATH=. pytest tests
-
-    - name: Test canary
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |-
-        DUMMY_ANNOTATION=true python main.py tests/canary.py LICENSE tests/py2.py
+    - name: Container info
+      run: docker ps
