@@ -5,6 +5,8 @@ on: push
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      GITHUB_API_URL: ${{ secrets.GITHUB_API_URL }}
     strategy:
       matrix:
         os: [ ubuntu-latest ]

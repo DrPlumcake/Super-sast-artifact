@@ -66,7 +66,15 @@ if __name__ == "__main__":
         "checkov": " -o json",
         "semgrep": " --json",
         }
-        
+    
+    REQUIRED_ENV = {"GITHUB_API_URL", "GITHUB_REPOSITORY", "GITHUB_SHA", "GITHUB_TOKEN"}
+        # this control doesn't make sense anymore, now that there are also super-sast env-var
+    if not REQUIRED_ENV < set(environ):
+        log.warning(
+            "Missing one or more of the following environment variables",
+            REQUIRED_ENV - set(environ),
+        )
+        raise SystemExit(1)
     try:
         if args.environs or args.dump_config:
             _show_environ(Path(args.config_dir), dump_config=args.dump_config)
@@ -101,6 +109,7 @@ if __name__ == "__main__":
 
         log.info(f"The log of bandit is in {PATH}log_dir/bandit.log")
         bandit_checks = bandit.bandit_parse("log_dir/bandit.log")
+        
         u_patch = "{GITHUB_API_URL}/repos/{GITHUB_REPOSITORY}/commits/{GITHUB_SHA}/check-runs".format(
             **environ
         )
@@ -123,12 +132,5 @@ if __name__ == "__main__":
         '''
         for tool in json_arg_dict.keys():
             run(["python", parse_scripts/f"{tool}.py", log_dir/f"{tool}.log"])   
-        REQUIRED_ENV = {"GITHUB_API_URL", "GITHUB_REPOSITORY", "GITHUB_SHA", "GITHUB_TOKEN"}
-        # this control doesn't make sense anymore, now that there are also super-sast env-var
-        if not REQUIRED_ENV < set(environ):
-            log.warning(
-                "Missing one or more of the following environment variables",
-                REQUIRED_ENV - set(environ),
-            )
-            raise SystemExit(1)
+        
         '''
