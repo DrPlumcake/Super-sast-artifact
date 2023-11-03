@@ -7,10 +7,10 @@ COPY --from=super-sast / /
 # RUN apt-get update
 ADD main.py /
 ADD entrypoint.sh /
-RUN mkdir -p /log_dir
+RUN mkdir log_dir
 ADD sast_to_log.py /
 
-RUN mkdir -p /parse_scripts
+RUN mkdir parse_scripts
 ADD parse_scripts/bandit.py /parse_scripts
 ADD request.py /
 
