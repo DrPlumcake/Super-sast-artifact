@@ -28,7 +28,7 @@ def write_to_log(tool, path):
             if line.startswith("}"):
                 log.info("}")
             exit_from_log(file_handler)
-            log.info(line)
+            log.info(line[1:])
             return
         if line.strip().endswith(f"Skipping {tool}") and line[20:28].strip() != "WARNING":
             exit_from_log(file_handler)
@@ -78,8 +78,6 @@ if __name__ == "__main__":
     # Log to stdout.
     logging.basicConfig(
         level=logging.INFO,
-        format="%(asctime)s %(levelname)s %(message)s",
-        datefmt="%Y-%m-%dT%H:%M:%S",
         handlers=[
             logging.StreamHandler(stream=stdout),
         ],
