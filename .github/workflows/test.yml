@@ -18,9 +18,10 @@ jobs:
 
     steps:
     - name: GitHub env variables
-      run: echo "$GITHUB_API_URL"
-      run: echo "$GITHUB_REPOSITORY"
-      run: echo "$GITHUB_SHA"
+      run: |
+        echo "$GITHUB_API_URL"
+        echo "$GITHUB_REPOSITORY"
+        echo "$GITHUB_SHA"
     - uses: actions/checkout@v2
 
     - name: Build Docker image
