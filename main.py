@@ -66,7 +66,7 @@ if __name__ == "__main__":
         "checkov": " -o json",
         "semgrep": " --json",
         }
-    
+    '''
     REQUIRED_ENV = {"GITHUB_API_URL", "GITHUB_REPOSITORY", "GITHUB_SHA", "GITHUB_TOKEN"}
         # this control doesn't make sense anymore, now that there are also super-sast env-var
     if not REQUIRED_ENV < set(environ):
@@ -75,6 +75,7 @@ if __name__ == "__main__":
             REQUIRED_ENV - set(environ),
         )
         raise SystemExit(1)
+    '''
     try:
         if args.environs or args.dump_config:
             _show_environ(Path(args.config_dir), dump_config=args.dump_config)
