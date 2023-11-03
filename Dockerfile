@@ -10,8 +10,6 @@ ADD entrypoint.sh /
 ADD sast_to_log.py /
 
 RUN mkdir parse_scripts
-RUN mkdir log_dir
-RUN ls -lah log_dir
 ADD parse_scripts/bandit.py /parse_scripts
 ADD request.py /
 

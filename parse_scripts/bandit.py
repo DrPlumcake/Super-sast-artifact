@@ -94,7 +94,8 @@ def only_json(log):
         #lines_form = ''.join(lines_without_newlines)
         log_fd.truncate(0)
         log_fd.seek(0)
-        log_fd.writelines(lines[enum:])
+        log_fd.writelines(lines[enum:-1])
+        log_fd.write(lines[-1].strip())
 
 def bandit_parse(log):
     only_json(log)

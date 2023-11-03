@@ -23,7 +23,7 @@ def write_to_log(tool, path):
         line = stdin.readline().rstrip()
         if line[25:].strip().startswith(f"Running {tool}") or line[25:].strip().startswith(f"Preparing {tool}") or line.strip().endswith("WARNING Directory /code/.m2 already exists. Skipping copy.") or line[25:].strip().startswith("Running trivy"):
             continue
-        if line.strip().endswith("Skipping maven command because pom.xml is missing") or line[:-2].strip().endswith(f"{tool} failed with status"):
+        if line.strip().endswith("Skipping maven command because pom.xml is missing") or line[:-1].strip().endswith("failed with status"):
             # exit status_code = 0 -> end of tool file
             if line.startswith("}"):
                 log.info("}")
