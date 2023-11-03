@@ -5,6 +5,7 @@ on: push
 jobs:
   build:
     runs-on: ubuntu-latest
+
     env:
       GITHUB_API_URL: ${{ github.api_url }}
       GITHUB_REPOSITORY: ${{ github.repository }}
@@ -16,6 +17,10 @@ jobs:
     name: Python ${{ matrix.python-version }} ${{ matrix.os }}
 
     steps:
+    - name: GitHub env variables
+      run: echo "$GITHUB_API_URL"
+      run: echo "$GITHUB_REPOSITORY"
+      run: echo "$GITHUB_SHA"
     - uses: actions/checkout@v2
 
     - name: Build Docker image
