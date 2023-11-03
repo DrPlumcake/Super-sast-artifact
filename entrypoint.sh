@@ -17,8 +17,7 @@ bandit ${BANDIT_CONFIG} -r "${INPUT_PROJECT_PATH}" -o "${GITHUB_WORKSPACE}/outpu
 BANDIT_STATUS="$?"
 
 echo "output of filesystem structure:\n"
-ls -lah
-ls -lah log_dir/
+mkdir log_dir
 
 GITHUB_TOKEN=$INPUT_REPO_TOKEN python /main.py 
 
