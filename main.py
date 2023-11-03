@@ -68,7 +68,6 @@ if __name__ == "__main__":
         }
     '''
     REQUIRED_ENV = {"GITHUB_API_URL", "GITHUB_REPOSITORY", "GITHUB_SHA", "GITHUB_TOKEN"}
-        # this control doesn't make sense anymore, now that there are also super-sast env-var
     if not REQUIRED_ENV < set(environ):
         log.warning(
             "Missing one or more of the following environment variables",
