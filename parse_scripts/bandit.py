@@ -2,6 +2,7 @@ from pathlib import Path
 import json
 from datetime import datetime, timezone
 from os import environ
+from request import to_gh_severity
 
 def bandit_annotation(result):
     try:
@@ -13,7 +14,7 @@ def bandit_annotation(result):
         path=result["filename"],
         start_line=result["line_number"],
         end_line=end_line,
-        annotation_level=result["issue_severity"],
+        annotation_level=to_gh_severity(result["issue_severity"]),
         title="Test: {test_name} id: {test_id}".format(**result),
         message="{issue_text} more info {more_info}".format(**result),
     )
