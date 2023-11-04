@@ -88,6 +88,6 @@ if __name__ == "__main__":
         next_tool = write_to_log(tool=tool, path=log_path)
     
     line = stdin.readline().strip()
-    while line[20:24] == "INFO":
+    while line != "":
         log.info(line)
         line = stdin.readline().strip()  
