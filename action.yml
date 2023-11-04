@@ -1,9 +1,9 @@
 #
-# Forked from  Joel-hanson/bandit-report-artifacts
+# Forked from  ioggstream/bandit-report-artifacts
 #
-name: "python-bandit with code annotations"
-description: "Github action to find common security issues in Python code and get its report as a artifact."
-author: "robipolli@gmail.com"
+name: "super-sast with code annotations"
+description: "Github action to find common security issues in your project and get its report as a artifact."
+author: "fantasticiniandrea@gmail.com"
 
 inputs:
   project_path:

@@ -1,156 +1,136 @@
 from collections import namedtuple
 from pathlib import Path
-import requests
-import json
+from argparse import ArgumentParser
 from subprocess import (  # nosec - module is used cleaning environment variables and with shell=False
-    run,
+    Popen, PIPE
 )
-from datetime import datetime, timezone
-from os import environ
+from os import environ, dup2, getuid, getgid
+import logging
+from sys import stdout, stderr
+from request import gh
+from parse_scripts import bandit
 
+PATH = Path(__file__).parent
 
-def gh(url, method="GET", data=None, headers=None, token=None):
-    headers = dict(
-        headers or {}, **{"Accept": "application/vnd.github.antiope-preview+json"}
-    )
-    if token:
-        headers["Authorization"] = f"token {token}"
-    return requests.request(method=method, url=url, headers=headers, data=data)
+# Log to stdout
+# for both stdout and stderr.
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(message)s",
+    datefmt="%Y-%m-%dT%H:%M:%S",
+    handlers=[
+        logging.StreamHandler(),
+    ],
+)
+log = logging.getLogger(__name__)
 
-
-def to_gh_severity(bandit_severity):
-    # Maps bandit severity to github annotation_level
-    # see: https://docs.github.com/en/rest/reference/checks#create-a-check-run
-    bandit_severity = bandit_severity.lower()
-    bandit_severity_map = {
-        "low": "notice",
-        "medium": "warning",
-        "high": "failure",
-        "undefined": "notice",
-    }
-    return bandit_severity_map[bandit_severity]
-
-
-def run_bandit(args, env=None):
-    #  Control environment variables passed to bandit.
-    my_args = ["bandit", "-f", "json"] + args
-    out = run(  # nosec - this input cannot execute different commands.
-        my_args, shell=False, capture_output=True, env=env or {"PATH": environ["PATH"]},
-    )
-    if out.returncode < 2:
-        # Everything ok
-        return json.loads(out.stdout)
-    raise SystemExit(out.stderr)
-
-
-def bandit_annotation(result):
-    try:
-        end_line = result["line_range"][-1]
-    except (KeyError, IndexError):
-        end_line = result["line_number"]
-
-    d = dict(
-        path=result["filename"],
-        start_line=result["line_number"],
-        end_line=end_line,
-        annotation_level=to_gh_severity(result["issue_severity"]),
-        title="Test: {test_name} id: {test_id}".format(**result),
-        message="{issue_text} more info {more_info}".format(**result),
-    )
-
-    return d
-
-
-def bandit_error(error):
-    from ast import parse
-
-    title = "Error processing file (not a python file?)"
-    start_line, end_line = 1, 1
-    message = error["reason"]
-    try:
-        parse(Path(error["filename"]).read_text())
-    except SyntaxError as e:
-        title, _ = e.args
-        end_line = start_line = e.lineno
-        message = e.msg
-    except Exception as e:  # nosec - I really want to ignore further exceptions here.
-        # Use default error values
-        pass
-
-    return dict(
-        path=error["filename"],
-        start_line=start_line,
-        end_line=end_line,
-        annotation_level="failure",
-        title=title,
-        message=message,
-    )
-
-
-def bandit_annotations(results):
-    return [bandit_annotation(result) for result in results["results"]]
-
-
-def bandit_run_check(results, github_sha=None, dummy=False):
-    annotations = bandit_annotations(results)
-    errors = [bandit_error(e) for e in results["errors"]]
-    conclusion = "success"
-    title = "Bandit: no issues found"
-    name = "Bandit comments"
-    summary = (
-        f"""Total statistics: {json.dumps(results['metrics']["_totals"], indent=2)}"""
-    )
-
-    if errors or annotations:
-        conclusion = "failure"
-        title = f"Bandit: {len(errors)} errors and {len(annotations)} annotations found"
-    if dummy:
-        conclusion = "neutral"
-        name = "Bandit dummy run"
-        title = "Bandit dummy run (always neutral)"
-
-    return {
-        "name": name,
-        "head_sha": github_sha,
-        "completed_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
-        "conclusion": conclusion,
-        "output": {
-            "title": title,
-            "summary": summary,
-            "annotations": annotations + errors,
-        },
-    }
-
-
+def env_json(tool):
+    value = json_arg_dict.get(tool, "None")
+    if value == "None":
+        return
+    var = f"{tool.upper()}_ARGS"
+    if environ.get(var, value) != value:
+        env = environ.get(var, value)
+        environ[var] = env + value
+    else:
+        environ[var] = value
+        
 if __name__ == "__main__":
-    from sys import argv
+    from entrypoint import _show_environ, run_sast, TOOLS_MAP, _copy_java_validators
 
+    parser = ArgumentParser()
+    parser.add_argument(
+        "--config-dir",
+        help="Directory containing config files",
+        default="/app/config",
+    )
+    parser.add_argument(
+        "--environs",
+        help="Environment variables to pass to the tools",
+        default="",
+        action="store_true",
+    )
+    parser.add_argument(
+        "--dump-config",
+        help="Environment variables to pass to the tools",
+        default="",
+        action="store_true",
+    )
+    args = parser.parse_args()
+    json_arg_dict = {
+        "trivy_config": " -f json",
+        "trivy_filesystem": " -f json",
+        "bandit": "-f json",
+        "safety": " --output json",
+        "kubescape": " --format json",
+        "checkov": " -o json",
+        "semgrep": " --json",
+        }
+    '''
     REQUIRED_ENV = {"GITHUB_API_URL", "GITHUB_REPOSITORY", "GITHUB_SHA", "GITHUB_TOKEN"}
     if not REQUIRED_ENV < set(environ):
-        print(
+        log.warning(
             "Missing one or more of the following environment variables",
             REQUIRED_ENV - set(environ),
         )
         raise SystemExit(1)
+    '''
+    try:
+        if args.environs or args.dump_config:
+            _show_environ(Path(args.config_dir), dump_config=args.dump_config)
+        tee = Popen(
+            ["/usr/bin/tee", "super-sast.log"], shell=False, stdin=PIPE, stdout=PIPE
+        )
+        # Cause tee's stdin to get a copy of our stdin/stdout (as well as that
+        # of any child processes we spawn)
+        sast_to_log = Popen(
+            ["python", "sast_to_log.py"], shell=False, stdin=tee.stdout, stdout=stdout
+        )
+        dup2(tee.stdin.fileno(), stdout.fileno())
+        dup2(tee.stdin.fileno(), stderr.fileno())
+        # tee's stdout is used as input for sast_to_log code
+        # os.dup2(sast_to_log.stdin.fileno(), tee.stdout.fileno())
+        sast_status = {}
+        _copy_java_validators()
+        run_all = environ.get("RUN_ALL_TOOLS", "true").lower() == "true"
+        for tool, command in TOOLS_MAP.items():
+            env_json(tool)
+            status = run_sast(
+                tool,
+                command,
+                environ.copy(),
+                config_dir=Path(args.config_dir),
+                log_file=stdout,
+                run_all=run_all,
+            )
+            sast_status[tool] = status
+        log.info("All tools finished")
+        log.info(sast_status)
 
-    u_patch = "{GITHUB_API_URL}/repos/{GITHUB_REPOSITORY}/commits/{GITHUB_SHA}/check-runs".format(
-        **environ
-    )
-    u_post = "{GITHUB_API_URL}/repos/{GITHUB_REPOSITORY}/check-runs".format(**environ)
+        log.info(f"The log of bandit is in {PATH}log_dir/bandit.log")
+        bandit_checks = bandit.bandit_parse("log_dir/bandit.log")
+        
+        u_patch = "{GITHUB_API_URL}/repos/{GITHUB_REPOSITORY}/commits/{GITHUB_SHA}/check-runs".format(
+            **environ
+        )
+        u_post = "{GITHUB_API_URL}/repos/{GITHUB_REPOSITORY}/check-runs".format(**environ)
+        res = gh(
+            u_post,
+            method="POST",
+            data=bandit_checks,
+            token=environ["GITHUB_TOKEN"],
+        )
+        log.info("Workflow status:", res.status_code, res.json(), res.url)
+    except Exception as e:
+        log.error(
+            "An exception occurred while running SAST, context information below\n"
+            f" - UID: {getuid()}\n - GID: {getgid()}\n"
+            f" - Error: {type(e).__name__} -> {e}"
+        )
+        raise e
 
-    bandit_results = run_bandit(argv[1:], env={"PATH": environ["PATH"]})
-
-    bandit_checks = bandit_run_check(
-        bandit_results, environ.get("GITHUB_SHA"), dummy=environ.get("DUMMY_ANNOTATION")
-    )
-    res = gh(
-        u_post,
-        method="POST",
-        data=json.dumps(bandit_checks),
-        token=environ["GITHUB_TOKEN"],
-    )
-
-    print("Workflow status:", res.status_code, res.json(), res.url)
-
-    if res.status_code >= 300:
-        raise SystemExit(1)
+        '''
+        for tool in json_arg_dict.keys():
+            run(["python", parse_scripts/f"{tool}.py", log_dir/f"{tool}.log"])   
+        
+        '''
