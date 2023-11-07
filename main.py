@@ -3,13 +3,13 @@ from argparse import ArgumentParser
 from subprocess import (  # nosec - module is used cleaning environment variables and with shell=False
     Popen, PIPE
 )
-from os import environ, dup2, getuid, getgid
+from os import environ, dup2, getuid, getgid, mkdir
 import logging
 from sys import stdout, stderr, path
 from request import gh
 from sys import exit
 
-LOG_DIR = Path("./log_dir")
+
 path.append(Path(__file__).parent)
 from parse_scripts import bandit, safety
 
@@ -42,6 +42,17 @@ def env_json(tool, environ=environ):
 if __name__ == "__main__":
     from entrypoint import _show_environ, run_sast, TOOLS_MAP, _copy_java_validators
     
+    LOG_DIR = Path("./log_dir")
+
+    if LOG_DIR.exists():
+        print(f"La directory {LOG_DIR} esiste già")
+    else:
+        try:
+            mkdir(LOG_DIR)
+            print(f"La directory {LOG_DIR} è stata creata con successo")
+        except OSError as e:
+            print(f"Errore durante la creazione della directory {LOG_DIR}: {e}")
+            exit(1)
 
     parser = ArgumentParser()
     parser.add_argument(
