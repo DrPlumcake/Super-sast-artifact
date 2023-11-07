@@ -19,24 +19,14 @@ def semgrep_message(error):
     return error["message"].split("\n")[1]
 
 def semgrep_span(entry, span):
-    
-    start_line=span["start"]["line"],
-    end_line=span["end"]["line"],
-    start_column=end_column=None
-    int_list = [start_line, end_line]
-    if start_line == end_line:
-        start_column=span["end"]["col"]
-        end_column=span["end"]["col"]
-        int_list.append(start_column)
-        int_list.append(end_column)
-    
-    for integer in int_list:
-        if not isinstance(integer, int):
-            if isinstance(integer, list):
-                integer = integer[0]
-        else: 
-            isinstance(integer, str)
-            integer = int(integer)
+    start_line=end_line=1
+    if isinstance(span["start"]["line"], int) and isinstance(span["end"]["line"], int):
+        start_line=span["start"]["line"],
+        end_line=span["end"]["line"],
+        start_column=end_column=None
+        if start_line == end_line:
+            start_column=span["end"]["col"]
+            end_column=span["end"]["col"]
             
     d = dict(
         path=span["file"],
