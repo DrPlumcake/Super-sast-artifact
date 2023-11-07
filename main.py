@@ -45,13 +45,13 @@ if __name__ == "__main__":
     LOG_DIR = Path("./log_dir")
 
     if LOG_DIR.exists():
-        print(f"La directory {LOG_DIR} esiste già")
+        log.info(f"La directory {LOG_DIR} esiste già")
     else:
         try:
             mkdir(LOG_DIR)
-            print(f"La directory {LOG_DIR} è stata creata con successo")
+            log.info(f"La directory {LOG_DIR} è stata creata con successo")
         except OSError as e:
-            print(f"Errore durante la creazione della directory {LOG_DIR}: {e}")
+            log.info(f"Errore durante la creazione della directory {LOG_DIR}: {e}")
             exit(1)
 
     parser = ArgumentParser()
