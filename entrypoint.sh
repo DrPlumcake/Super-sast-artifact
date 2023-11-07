@@ -1,22 +1,17 @@
 #!/bin/sh -l
 
 echo "🔥🔥🔥🔥🔥Running security check🔥🔥🔥🔥🔥🔥"
-mkdir -p $GITHUB_WORKSPACE/output
-touch $GITHUB_WORKSPACE/output/security_report.txt
 
-# da cambiare le variabili d'ambiente
+dir="log_dir"
 
-if [ -f "${INPUT_CONFIG_FILE}" ]; then
-    echo "Using config file: ${INPUT_CONFIG_FILE}"
-    BANDIT_CONFIG="-c ${INPUT_CONFIG_FILE}"
+if [ -d "$dir" ]; then
+    echo "Directory $dir already exists"
+else
+    if mkdir "$dir"; then
+        echo "error during creation of $dir directory"
+        exit 1
+    fi
 fi
-    echo "Not using config file (test)"
-
-echo "Running bandit with: " ${BANDIT_CONFIG} -r "${INPUT_PROJECT_PATH}" -o "${GITHUB_WORKSPACE}/output/security_report.txt" -f 'txt'
-bandit ${BANDIT_CONFIG} -r "${INPUT_PROJECT_PATH}" -o "${GITHUB_WORKSPACE}/output/security_report.txt" -f 'txt'
-BANDIT_STATUS="$?"
-
-mkdir log_dir
 
 GITHUB_TOKEN=$INPUT_REPO_TOKEN python /main.py 
 
@@ -29,5 +24,5 @@ echo "🔥🔥🔥🔥Security check failed🔥🔥🔥🔥"
 if $INPUT_IGNORE_FAILURE; then
     exit 0
 fi
-
+    
 exit 0

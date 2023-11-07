@@ -10,7 +10,7 @@ ADD entrypoint.sh /
 ADD sast_to_log.py /
 
 RUN mkdir parse_scripts
-ADD parse_scripts/bandit.py /parse_scripts
+ADD parse_scripts/* /parse_scripts
 ADD request.py /
 
 RUN chmod +x /entrypoint.sh
