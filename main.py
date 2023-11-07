@@ -11,7 +11,7 @@ from sys import exit
 
 
 path.append(Path(__file__).parent)
-from parse_scripts import bandit, safety
+from parse_scripts import bandit, safety, semgrep
 
 # Log to stdout
 # for both stdout and stderr.
@@ -101,7 +101,8 @@ if __name__ == "__main__":
             },
         "semgrep": {
             "args": " --json",
-            "parse": "semgrep.parse"
+            "parse": semgrep,
+            "log": "semgrep.log"
             },
         "spotbugs":{},
         "owasp_dependency_check": {},
@@ -162,7 +163,7 @@ if __name__ == "__main__":
             LOG_FILE = Path(LOG_DIR) / log_file
             if Path(LOG_FILE).exists():
                 # File is empty
-                if tool != "bandit" and tool != "safety":
+                if tool != "bandit" and tool != "safety" and tool != "semgrep":
                     log.info(f"Sorry, annotations for {tool} are not available")
                     continue
                 if Path(LOG_FILE).stat().st_size == 0:
@@ -173,7 +174,7 @@ if __name__ == "__main__":
                     module = json_arg_dict.get(tool)["parse"]
                     tool_checks = module.parse(LOG_FILE, environ.get("GITHUB_SHA"))
                     if local:
-                        log.info("Request skipped for local testing")
+                        log.info(f"{tool} Request skipped for local testing")
                         continue
                     else:
                         res = gh(

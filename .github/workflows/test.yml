@@ -29,7 +29,7 @@ jobs:
 
     - name: Run Docker Image
       run: |
-        docker run --name super-sast-artifact -v $PWD:/code -e M2_HOME=/code -e HOME=/code -e RUN_ALL_TOOLS=false -e RUN_BANDIT=true -e RUN_SAFETY=true -e GITHUB_API_URL=${{ github.api_url }} -e GITHUB_REPOSITORY=${{ github.repository }} -e GITHUB_SHA=${{ github.sha }} -e INPUT_REPO_TOKEN=${{ github.token }} -w /code super-sast-action:0.4
+        docker run --name super-sast-artifact -v $PWD:/code -e M2_HOME=/code -e HOME=/code -e GITHUB_API_URL=${{ github.api_url }} -e GITHUB_REPOSITORY=${{ github.repository }} -e GITHUB_SHA=${{ github.sha }} -e INPUT_REPO_TOKEN=${{ github.token }} -w /code super-sast-action:0.4
 
     - uses: actions/upload-artifact@v3
       with:
