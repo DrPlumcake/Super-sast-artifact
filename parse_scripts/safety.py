@@ -19,8 +19,8 @@ def vulnerability(data, entry_name, entry_num):
     d = dict(
         path=data["affected_packages"][entry_name]["found"],
         # no code
-        start_line="1",
-        end_line="1",
+        start_line=1,
+        end_line=1,
         # not sure about this
         annotation_level=safety_to_gh_severity(severity),
         title=vuln["CVE"],
@@ -40,10 +40,10 @@ def vulnerabilities_to_annotations(data):
 
 def results(data, github_sha=None):
     safety_vulns = vulnerabilities_to_annotations(data)
-    conclusion = "Success"
+    conclusion = "success"
     title = "Safety: No vulnerabilities found"
     if safety_vulns:
-        conclusion = "Failure"
+        conclusion = "failure"
         title = f"Safety: {len(safety_vulns)} vulnerabilities found"
     summary = f"""Statistics: {json.dumps(data["report_meta"], indent=2)}"""
     results = {
