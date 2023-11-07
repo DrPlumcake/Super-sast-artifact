@@ -2,7 +2,18 @@ from pathlib import Path
 import json
 from datetime import datetime, timezone
 from os import environ
-from request import to_gh_severity
+
+def bandit_to_gh_severity(bandit_severity):
+    # Maps bandit severity to github annotation_level
+    # see: https://docs.github.com/en/rest/reference/checks#create-a-check-run
+    bandit_severity = bandit_severity.lower()
+    bandit_severity_map = {
+        "low": "notice",
+        "medium": "warning",
+        "high": "failure",
+        "undefined": "notice",
+    }
+    return bandit_severity_map[bandit_severity]
 
 def bandit_annotation(result):
     try:
@@ -14,7 +25,8 @@ def bandit_annotation(result):
         path=result["filename"],
         start_line=result["line_number"],
         end_line=end_line,
-        annotation_level=to_gh_severity(result["issue_severity"]),
+        annotation_level=bandit_to_gh_severity
+    (result["issue_severity"]),
         title="Test: {test_name} id: {test_id}".format(**result),
         message="{issue_text} more info {more_info}".format(**result),
     )
@@ -101,12 +113,12 @@ def only_json(log):
         log_fd.writelines(lines[enum:-1])
         log_fd.write(lines[-1].strip())
 
-def bandit_parse(log):
+def parse(log, sha=None):
     only_json(log)
     with open(log, "r") as fd:
         data = json.load(fd)
     bandit_checks = bandit_run_check(
-    data, environ.get("GITHUB_SHA"), dummy=environ.get("DUMMY_ANNOTATION")
+    data, sha, dummy=environ.get("DUMMY_ANNOTATION")
     )
     return json.dumps(bandit_checks)
     

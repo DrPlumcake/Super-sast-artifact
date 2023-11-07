@@ -3,8 +3,7 @@
 from sys import stdin, stdout
 from pathlib import Path
 from main import logging
-import os, stat
-from subprocess import run
+import os
 PATH_LOG_DIR = Path(__file__).parent / "log_dir"
 
 def write_to_log(tool, path):
@@ -23,7 +22,7 @@ def write_to_log(tool, path):
         line = stdin.readline().rstrip()
         if line[25:].strip().startswith(f"Running {tool}") or line[25:].strip().startswith(f"Preparing {tool}") or line.strip().endswith("WARNING Directory /code/.m2 already exists. Skipping copy.") or line[25:].strip().startswith("Running trivy"):
             continue
-        if line.strip().endswith("Skipping maven command because pom.xml is missing") or line[:-1].strip().endswith("failed with status"):
+        if line.strip().endswith("Skipping maven command because pom.xml is missing") or line[:-2].strip().endswith("failed with status"):
             # exit status_code = 0 -> end of tool file
             if line.startswith("}"):
                 log.info("}")
@@ -58,7 +57,7 @@ def write_to_log(tool, path):
 
 def exit_from_log(handler):
     # The file is closed so we remove the handler from the list      
-    log.removeHandler(handler)
+    log.removeHandler(handler)    
 
 if __name__ == "__main__":
     # from main import TOOLS_MAP // doesn't work for some reason
@@ -77,6 +76,8 @@ if __name__ == "__main__":
     ]
     # Log to stdout.
     logging.basicConfig(
+        format="%(message)s",
+        # datefmt="%Y-%m-%dT%H:%M:%S",
         level=logging.INFO,
         handlers=[
             logging.StreamHandler(stream=stdout),
