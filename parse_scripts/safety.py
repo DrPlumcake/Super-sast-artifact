@@ -37,6 +37,21 @@ def vulnerabilities_to_annotations(data):
         counter = counter + 1
     return vulns
 
+def statistics(data):
+    stats = {
+        "SCANNED": data["scanned"],
+        "SAFETY_VERSION": data["safety_version"],
+        "TIMESTAP": data["timestamp"],
+        "PACKAGES_FOUND": data["packages_found"],
+        "VULNERABILITIES_FOUND": data["vulnerabilities_found"],
+        "VULNERABILITIES_IGNORED": data["vulnerabilities_ignored"],
+        "REMEDIATIONS_RECOMMENDED": data["remediations_recommended"],
+        "OS_TYPE": data["telemetry"]["os_type"],
+        "PYTHON_VERSION": data["telemetry"]["python_version"],
+        "SAFETY_COMMAND": data["telemetry"]["safety_command"],
+        "SAFETY_VERSION": data["telemetry"]["safety_version"],
+    }
+    return stats
 
 def results(data, github_sha=None):
     safety_vulns = vulnerabilities_to_annotations(data)
@@ -45,7 +60,7 @@ def results(data, github_sha=None):
     if safety_vulns:
         conclusion = "failure"
         title = f"Safety: {len(safety_vulns)} vulnerabilities found"
-    summary = f"""Statistics: {json.dumps(data["report_meta"], indent=2)}"""
+    summary = f"""Statistics: {json.dumps(statistics(data["report_meta"]), indent=2)}"""
     results = {
         "name" : "Safety Comments",
         "head_sha": github_sha,
