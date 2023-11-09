@@ -12,8 +12,7 @@ severity_converter = {
 def semgrep_to_gh_severity(severity):
     if severity.startswith("err"):
         return "failure"
-    else:
-        return severity_converter.get(severity)
+    return severity_converter.get(severity)
 
 def semgrep_message(error):
     return error["message"].split("\n")[1]
@@ -70,7 +69,7 @@ def semgrep_results(log, github_sha=None):
         title.join("no errors found")
 
     text = None
-    if log["paths"].__contains__("_comment"):
+    if "_comment" in log["paths"]:
         text = log["paths"]["_comment"]
     results = {
         "name" : "Semgrep Comments",
