@@ -69,7 +69,7 @@ def semgrep_results(log, github_sha=None):
         title.join("no errors found")
 
     text = None
-    if log["paths"].__contains__("_comment"):
+    if "_comment" in log["paths"]:
         text = log["paths"]["_comment"]
     results = {
         "name" : "Semgrep Comments",
