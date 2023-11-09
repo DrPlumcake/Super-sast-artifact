@@ -1,15 +1,14 @@
-from pathlib import Path
-from argparse import ArgumentParser
-from subprocess import (  # nosec - module is used cleaning environment variables and with shell=False
-    Popen,
-    PIPE,
-)
-from os import environ, dup2, getuid, getgid, mkdir
 import logging
-from sys import stdout, stderr, path
-from request import gh
-from sys import exit
+from argparse import ArgumentParser
+from os import dup2, environ, getgid, getuid, mkdir
+from pathlib import Path
+from subprocess import (  # nosec - module is used cleaning environment variables and with shell=False
+    PIPE,
+    Popen,
+)
+from sys import exit, path, stderr, stdout
 
+from request import gh
 
 path.append(Path(__file__).parent)
 from parse_scripts import bandit, safety, semgrep
@@ -43,7 +42,7 @@ def env_json(tool, environ=environ):
 
 
 if __name__ == "__main__":
-    from entrypoint import _show_environ, run_sast, TOOLS_MAP, _copy_java_validators
+    from entrypoint import TOOLS_MAP, _copy_java_validators, _show_environ, run_sast
 
     LOG_DIR = Path("./log_dir")
 
@@ -143,7 +142,7 @@ if __name__ == "__main__":
                 **environ
             )
 
-        for tool in json_arg_dict.keys():
+        for tool, tool_setup in json_arg_dict.items():
             log_file = f"{tool}.log"
             LOG_FILE = Path(LOG_DIR) / log_file
             if tool not in ["bandit", "safety", "semgrep"]:
@@ -157,11 +156,13 @@ if __name__ == "__main__":
                 log.info(f"{log_file} is empty. Skipping parsing")
                 continue
             # tool_checks must be a Json object ready for request
-            parse_function = json_arg_dict.get(tool)["parse"].parse
+            parse_function = tool_setup["parse"].parse
             tool_checks = parse_function(LOG_FILE, environ.get("GITHUB_SHA"))
             if local:
                 log.info(f"{tool} Request skipped for local testing")
+                log.setLevel(logging.DEBUG)
                 log.debug(f"Result: {tool_checks}")
+                log.setLevel(logging.INFO)
                 continue
 
             res = gh(
@@ -170,9 +171,7 @@ if __name__ == "__main__":
                 data=tool_checks,
                 token=environ["GITHUB_TOKEN"],
             )
-            log.info(
-                "Request Status: %s %s %s", res.status_code, res.content(), res.url
-            )
+            log.info("Request Status: %s %s %s", res.status_code, res.content, res.url)
 
         log.info("Annotations succesfully sendend to PR: Process Completed\n")
         exit(0)
