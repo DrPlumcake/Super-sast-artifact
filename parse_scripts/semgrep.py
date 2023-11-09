@@ -22,10 +22,10 @@ def semgrep_message(error):
 
 def semgrep_span(entry, span):
     start_line = end_line = 1
+    start_column = end_column = None
     if isinstance(span["start"]["line"], int) and isinstance(span["end"]["line"], int):
-        start_line = (span["start"]["line"],)
-        end_line = (span["end"]["line"],)
-        start_column = end_column = None
+        start_line = span["start"]["line"]
+        end_line = span["end"]["line"]
         if start_line == end_line:
             start_column = span["start"]["col"]
             end_column = span["end"]["col"]
