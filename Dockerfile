@@ -9,7 +9,8 @@ ADD main.py /
 ADD entrypoint.sh /
 ADD sast_to_log.py /
 
-COPY parse_scripts /
+RUN mkdir parse_scripts
+COPY parse_scripts/* /parse_scripts
 ADD request.py /
 COPY tests /
 
