@@ -9,7 +9,7 @@ def checkov_to_gh_severity(severity):
 
 
 def checkov_test(test):
-    message = (test["check_name"],)
+    message = test["check_name"]
     if test["guideline"] is not None:
         info = test["guideline"]
         message = f"{message} - More info: {info}"
