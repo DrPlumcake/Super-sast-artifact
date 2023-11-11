@@ -73,6 +73,11 @@ def parse_tools(dict, log, log_path, test=False, local=False):
             )
             log.info("Request Status: %s %s %s", res.status_code, res.content, res.url)
 
+        if not local:
+            log.setLevel(logging.DEBUG)
+            log.debug(f"Result: {tool_checks}")
+            log.setLevel(logging.INFO)
+
 
 if __name__ == "__main__":
     from entrypoint import TOOLS_MAP, _copy_java_validators, _show_environ, run_sast
