@@ -24,37 +24,7 @@ expected_results = {
                 "annotation_level": "warning",
                 "title": "Syntax error",
                 "message": " When parsing a snippet as Bash for metavariable-pattern in rule 'yaml.github-actions.security.curl-eval.curl-eval'",
-            },
-            {
-                "path": ".github/workflows/test.yml",
-                "start_line": 31,
-                "end_line": 31,
-                "start_column": 157,
-                "end_column": 160,
-                "annotation_level": "warning",
-                "title": "Syntax error",
-                "message": " When parsing a snippet as Bash for metavariable-pattern in rule 'yaml.github-actions.security.curl-eval.curl-eval'",
-            },
-            {
-                "path": ".github/workflows/test.yml",
-                "start_line": 31,
-                "end_line": 31,
-                "start_column": 196,
-                "end_column": 199,
-                "annotation_level": "warning",
-                "title": "Syntax error",
-                "message": " When parsing a snippet as Bash for metavariable-pattern in rule 'yaml.github-actions.security.curl-eval.curl-eval'",
-            },
-            {
-                "path": ".github/workflows/test.yml",
-                "start_line": 31,
-                "end_line": 31,
-                "start_column": 234,
-                "end_column": 237,
-                "annotation_level": "warning",
-                "title": "Syntax error",
-                "message": " When parsing a snippet as Bash for metavariable-pattern in rule 'yaml.github-actions.security.curl-eval.curl-eval'",
-            },
+            }
         ],
     },
 }
@@ -65,11 +35,5 @@ def test_semgrep():
     output = out_file.read_text()
     data = json.loads(output)
     actual_results = parse_scripts.semgrep.parse_data(data, "stuff")
-    assert (
-        actual_results["output"]["annotations"][0]["start_line"]
-        == expected_results["output"]["annotations"][0]["start_line"]
-    )
-    assert (
-        actual_results["output"]["annotations"][0]["end_line"]
-        == expected_results["output"]["annotations"][0]["end_line"]
-    )
+    actual_results["completed_at"] = "2023-11-09T15:29:33.821590Z"
+    assert expected_results == actual_results

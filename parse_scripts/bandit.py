@@ -26,7 +26,11 @@ def bandit_annotation(result):
     start_column = 1
     end_column = 1
 
-    if end_line == result["line_number"]:
+    if (
+        end_line == result["line_number"]
+        and "col_offset" in result
+        and "end_column" in result
+    ):
         start_column = result["col_offset"]
         end_column = result["end_col_offset"]
     d = dict(

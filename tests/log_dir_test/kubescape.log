@@ -1,0 +1,23 @@
+{"level":"info","ts":"2023-11-11T10:56:47Z","msg":"Kubescape scanner starting"}
+{"level":"warn","ts":"2023-11-11T10:56:48Z","msg":"current version 'v2.0.180' is not updated to the latest release: 'v3.0.0'"}
+{"level":"warn","ts":"2023-11-11T10:56:48Z","msg":"Deprecated format version","run":"--format-version=v2","This will not be supported after":"1/Jan/2023"}
+{"level":"info","ts":"2023-11-11T10:56:51Z","msg":"Downloading/Loading policy definitions"}
+{"level":"info","ts":"2023-11-11T10:56:51Z","msg":"Downloaded/Loaded policy"}
+{"level":"info","ts":"2023-11-11T10:56:51Z","msg":"Accessing local objects"}
+{"level":"info","ts":"2023-11-11T10:56:53Z","msg":"Done accessing local objects"}
+{"level":"info","ts":"2023-11-11T10:56:53Z","msg":"Scanning GitLocal"}
+{"level":"info","ts":"2023-11-11T10:56:53Z","msg":"Done scanning GitLocal"}
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Kubescape did not scan any of the resources, make sure you are scanning valid kubernetes manifests (Deployments, Pods, etc.)
+{"level":"info","ts":"2023-11-11T10:56:53Z","msg":"Scan results saved","filename":"report.json"}
+
+Overall risk-score (0- Excellent, 100- All failed): 0
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Scan results have not been submitted: run kubescape with the '--account' flag
+For more details: https://hub.armosec.io/docs/installing-kubescape?utm_campaign=Submit&utm_medium=CLI&utm_source=GitHub
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Run with '--verbose'/'-v' flag for detailed resources view

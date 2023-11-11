@@ -46,7 +46,7 @@ def checkov_results(log, github_sha):
     summary_1 = json.dumps(log[1]["summary"], indent=2)
     url = log[0]["url"]
 
-    summary = f"""Total statistics: \n Check_Type: {check_type_0}\n{summary_0} \n\n Check_Type: {check_type_1}\n{summary_1}\n\n {url}"""
+    summary = f"""Total statistics:\n Check_Type: {check_type_0}\n{summary_0}\n\n Check_Type: {check_type_1}\n{summary_1}\n\n{url}"""
 
     results = {
         "name": "Checkov Comments",

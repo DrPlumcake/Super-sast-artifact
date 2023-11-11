@@ -24,15 +24,15 @@ logging.basicConfig(
 log = logging.getLogger(__name__)
 
 
-def env_json(tool, environ=environ):
-    value_tool = json_arg_dict.get(tool, "None")
+def env_json(dict, tool, environ=environ):
+    value_tool = dict.get(tool, "None")
     if value_tool == "None":
         return
     value = value_tool.get("args", "None")
     if value == "None":
         return
     var = f"{tool.upper()}_ARGS"
-    if environ.get(var, value) != value:
+    if value.strip() not in environ.get(var, value):
         env = environ.get(var, value)
         environ[var] = env + value
     else:
@@ -152,7 +152,7 @@ if __name__ == "__main__":
         _copy_java_validators()
         run_all = environ.get("RUN_ALL_TOOLS", "true").lower() == "true"
         for tool, command in TOOLS_MAP.items():
-            env_json(tool)
+            env_json(dict=json_arg_dict, tool=tool)
             status = run_sast(
                 tool,
                 command,

@@ -50,7 +50,7 @@ def summary(data):
         "paths scanned": len(data["paths"]["scanned"]),
     }
 
-    return f"""Semgrep statistics: {json.dumps(d)}"""
+    return f"""Semgrep statistics: {json.dumps(d, indent=2)}"""
 
 
 def semgrep_entries(entry):

@@ -1,7 +1,7 @@
 import logging
 from pathlib import Path
 
-from main import parse_tools
+from main import env_json, parse_tools
 from parse_scripts import bandit, checkov, safety, semgrep
 
 logging.basicConfig(
@@ -10,6 +10,9 @@ logging.basicConfig(
     handlers=[],
 )
 log = logging.getLogger(__name__)
+
+TEST_DIR = Path(__file__).parent
+LOG_DIR = TEST_DIR / "log_dir_test"
 
 json_arg_dict = {
     "trivy_config": {"args": " -f json", "log": "trivy_config.log"},
@@ -45,8 +48,7 @@ def test_main_print():
         "Sorry, annotations for spotless_check are not available\n",
         "Sorry, annotations for spotless_apply are not available\n",
     ]
-    TEST_DIR = Path(__file__).parent
-    LOG_DIR = TEST_DIR / "log_dir_test"
+
     log.setLevel(logging.INFO)
     file_handler = logging.FileHandler(TEST_DIR / "super-sast-test.log", mode="w")
     log.addHandler(file_handler)
@@ -54,3 +56,31 @@ def test_main_print():
     with open(TEST_DIR / "super-sast-test.log", "r") as sast_fd:
         text = sast_fd.readlines()
     assert text == expected_text
+
+
+def test_env_json():
+    env = {
+        # Normal case
+        "BANDIT_ARGS": "",
+        # Wrong tool name
+        "TOOL_ARGS": "",
+        # Not args var
+        "SAFETY_CONFIG": "",
+        # Other args instead of empty
+        "SEMGREP_ARGS": "--verbose",
+        # var already set to json
+        "CHECKOV_ARGS": " -o json",
+    }
+    env_json(dict=json_arg_dict, tool="bandit", environ=env)
+    env_json(dict=json_arg_dict, tool="semgrep", environ=env)
+    env_json(dict=json_arg_dict, tool="safety", environ=env)
+    env_json(dict=json_arg_dict, tool="checkov", environ=env)
+    env_json(dict=json_arg_dict, tool="tool", environ=env)
+    assert env == {
+        "BANDIT_ARGS": " -f json",
+        "TOOL_ARGS": "",
+        "SAFETY_ARGS": " --output json",
+        "SAFETY_CONFIG": "",
+        "SEMGREP_ARGS": "--verbose --json",
+        "CHECKOV_ARGS": " -o json",
+    }
