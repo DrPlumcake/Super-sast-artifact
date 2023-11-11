@@ -1,17 +1,17 @@
-from pathlib import Path
-from argparse import ArgumentParser
-from subprocess import (  # nosec - module is used cleaning environment variables and with shell=False
-    Popen, PIPE
-)
-from os import environ, dup2, getuid, getgid, mkdir
 import logging
-from sys import stdout, stderr, path
-from request import gh
-from sys import exit
+from argparse import ArgumentParser
+from os import dup2, environ, getgid, getuid, mkdir
+from pathlib import Path
+from subprocess import (  # nosec - module is used cleaning environment variables and with shell=False
+    PIPE,
+    Popen,
+)
+from sys import exit, path, stderr, stdout
 
+from request import gh
 
 path.append(Path(__file__).parent)
-from parse_scripts import bandit, safety
+from parse_scripts import bandit, safety, semgrep
 
 # Log to stdout
 # for both stdout and stderr.
@@ -24,6 +24,7 @@ logging.basicConfig(
     ],
 )
 log = logging.getLogger(__name__)
+
 
 def env_json(tool, environ=environ):
     value_tool = json_arg_dict.get(tool, "None")
@@ -38,10 +39,11 @@ def env_json(tool, environ=environ):
         environ[var] = env + value
     else:
         environ[var] = value
-        
+
+
 if __name__ == "__main__":
-    from entrypoint import _show_environ, run_sast, TOOLS_MAP, _copy_java_validators
-    
+    from entrypoint import TOOLS_MAP, _copy_java_validators, _show_environ, run_sast
+
     LOG_DIR = Path("./log_dir")
 
     if LOG_DIR.exists():
@@ -74,41 +76,22 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     json_arg_dict = {
-        "trivy_config": {
-            "args": " -f json",
-            "log": "trivy_config.log"
-        },
-        "trivy_filesystem": {
-            "args": " -f json",
-            "log": "trivy.log"
-            },
-        "bandit": {
-            "args": " -f json",
-            "parse": bandit,
-            "log": "bandit.log"
-            },
+        "trivy_config": {"args": " -f json", "log": "trivy_config.log"},
+        "trivy_filesystem": {"args": " -f json", "log": "trivy.log"},
+        "bandit": {"args": " -f json", "parse": bandit, "log": "bandit.log"},
         "safety": {
             "args": " --output json",
             "parse": safety,
-            },
-        "kubescape": {
-            "args": " --format json",
-            "parse": "kubescape.py"
-            },
-        "checkov": {
-            "args":  " -o json",
-            "parse": "checkov.parse"
-            },
-        "semgrep": {
-            "args": " --json",
-            "parse": "semgrep.parse"
-            },
-        "spotbugs":{},
+        },
+        "kubescape": {"args": " --format json", "parse": "kubescape.py"},
+        "checkov": {"args": " -o json", "parse": "checkov.parse"},
+        "semgrep": {"args": " --json", "parse": semgrep, "log": "semgrep.log"},
+        "spotbugs": {},
         "owasp_dependency_check": {},
         "spotless_check": {},
-        "spotless_apply": {}
-        }
-    '''
+        "spotless_apply": {},
+    }
+    """
     REQUIRED_ENV = {"GITHUB_API_URL", "GITHUB_REPOSITORY", "GITHUB_SHA", "GITHUB_TOKEN"}
     if not REQUIRED_ENV < set(environ):
         log.warning(
@@ -116,7 +99,7 @@ if __name__ == "__main__":
             REQUIRED_ENV - set(environ),
         )
         raise SystemExit(1)
-    '''
+    """
     try:
         if args.environs or args.dump_config:
             _show_environ(Path(args.config_dir), dump_config=args.dump_config)
@@ -153,40 +136,44 @@ if __name__ == "__main__":
             local = True
         if not local:
             u_patch = "{GITHUB_API_URL}/repos/{GITHUB_REPOSITORY}/commits/{GITHUB_SHA}/check-runs".format(
-            **environ
+                **environ
             )
-            u_post = "{GITHUB_API_URL}/repos/{GITHUB_REPOSITORY}/check-runs".format(**environ)
-        
-        for tool in json_arg_dict.keys():
+            u_post = "{GITHUB_API_URL}/repos/{GITHUB_REPOSITORY}/check-runs".format(
+                **environ
+            )
+
+        for tool, tool_setup in json_arg_dict.items():
             log_file = f"{tool}.log"
             LOG_FILE = Path(LOG_DIR) / log_file
-            if Path(LOG_FILE).exists():
+            if tool not in ["bandit", "safety", "semgrep"]:
+                log.info(f"Sorry, annotations for {tool} are not available")
+                continue
+            if not Path(LOG_FILE).exists():
                 # File is empty
-                if tool != "bandit" and tool != "safety":
-                    log.info(f"Sorry, annotations for {tool} are not available")
-                    continue
-                if Path(LOG_FILE).stat().st_size == 0:
-                    log.info(f"{log_file} is empty. Skipping parsing")
-                    continue
-                elif Path(LOG_FILE).stat().st_size > 0:
-                    # tool_checks must be a Json object ready for request
-                    module = json_arg_dict.get(tool)["parse"]
-                    tool_checks = module.parse(LOG_FILE, environ.get("GITHUB_SHA"))
-                    if local:
-                        log.info("Request skipped for local testing")
-                        continue
-                    else:
-                        res = gh(
-                        u_post,
-                        method="POST",
-                        data=tool_checks,
-                        token=environ["GITHUB_TOKEN"],
-                        )
-                        log.info("Request Status:", res.status_code, res.json(), res.url)
-                    
-            else:
                 log.error(f"{LOG_FILE} does not exists")
-        log.info("Annotations succesfully sendend to PR: Process Completed\n") 
+                continue
+            if Path(LOG_FILE).stat().st_size == 0:
+                log.info(f"{log_file} is empty. Skipping parsing")
+                continue
+            # tool_checks must be a Json object ready for request
+            parse_function = tool_setup["parse"].parse
+            tool_checks = parse_function(LOG_FILE, environ.get("GITHUB_SHA"))
+            if local:
+                log.info(f"{tool} Request skipped for local testing")
+                log.setLevel(logging.DEBUG)
+                log.debug(f"Result: {tool_checks}")
+                log.setLevel(logging.INFO)
+                continue
+
+            res = gh(
+                u_post,
+                method="POST",
+                data=tool_checks,
+                token=environ["GITHUB_TOKEN"],
+            )
+            log.info("Request Status: %s %s %s", res.status_code, res.content, res.url)
+
+        log.info("Annotations succesfully sendend to PR: Process Completed\n")
         exit(0)
     except Exception as e:
         log.error(
