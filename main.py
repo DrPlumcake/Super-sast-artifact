@@ -6,12 +6,10 @@ from subprocess import (  # nosec - module is used cleaning environment variable
     PIPE,
     Popen,
 )
-from sys import exit, path, stderr, stdout
+from sys import exit, stderr, stdout
 
+from parse_scripts import bandit, checkov, safety, semgrep
 from request import gh
-
-path.append(Path(__file__).parent)
-from parse_scripts import bandit, safety, semgrep
 
 # Log to stdout
 # for both stdout and stderr.
@@ -84,7 +82,7 @@ if __name__ == "__main__":
             "parse": safety,
         },
         "kubescape": {"args": " --format json", "parse": "kubescape.py"},
-        "checkov": {"args": " -o json", "parse": "checkov.parse"},
+        "checkov": {"args": " -o json", "parse": checkov, "log": "checkov.log"},
         "semgrep": {"args": " --json", "parse": semgrep, "log": "semgrep.log"},
         "spotbugs": {},
         "owasp_dependency_check": {},
@@ -145,7 +143,7 @@ if __name__ == "__main__":
         for tool, tool_setup in json_arg_dict.items():
             log_file = f"{tool}.log"
             LOG_FILE = Path(LOG_DIR) / log_file
-            if tool not in ["bandit", "safety", "semgrep"]:
+            if tool not in ["bandit", "safety", "semgrep", "checkov"]:
                 log.info(f"Sorry, annotations for {tool} are not available")
                 continue
             if not Path(LOG_FILE).exists():
