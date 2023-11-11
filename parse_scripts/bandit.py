@@ -1,7 +1,8 @@
-from pathlib import Path
 import json
 from datetime import datetime, timezone
 from os import environ
+from pathlib import Path
+
 
 def bandit_to_gh_severity(bandit_severity):
     # Maps bandit severity to github annotation_level
@@ -15,23 +16,32 @@ def bandit_to_gh_severity(bandit_severity):
     }
     return bandit_severity_map[bandit_severity]
 
+
 def bandit_annotation(result):
     try:
         end_line = result["line_range"][-1]
     except (KeyError, IndexError):
         end_line = result["line_number"]
 
+    start_column = 1
+    end_column = 1
+
+    if end_line == result["line_number"]:
+        start_column = result["col_offset"]
+        end_column = result["end_col_offset"]
     d = dict(
         path=result["filename"],
         start_line=result["line_number"],
         end_line=end_line,
-        annotation_level=bandit_to_gh_severity
-    (result["issue_severity"]),
+        start_column=start_column,
+        end_column=end_column,
+        annotation_level=bandit_to_gh_severity(result["issue_severity"]),
         title="Test: {test_name} id: {test_id}".format(**result),
         message="{issue_text} more info {more_info}".format(**result),
     )
 
     return d
+
 
 def bandit_error(error):
     from ast import parse
@@ -93,6 +103,7 @@ def bandit_run_check(results, github_sha=None, dummy=False):
         },
     }
 
+
 # Only json data
 def only_json(log):
     enum = 0
@@ -103,22 +114,20 @@ def only_json(log):
             line = log_fd.readline()
         log_fd.seek(0)
         lines = log_fd.readlines()
-        
+
         # In case if json file without indentation, remove [enum:] from lines
-        #lines_without_newlines = [line.strip() for line in lines[enum:]]
-        #lines = ''.join(lines_without_newlines)
-        
+        # lines_without_newlines = [line.strip() for line in lines[enum:]]
+        # lines = ''.join(lines_without_newlines)
+
         log_fd.truncate(0)
         log_fd.seek(0)
         log_fd.writelines(lines[enum:-1])
         log_fd.write(lines[-1].strip())
 
+
 def parse(log, sha=None):
     only_json(log)
     with open(log, "r") as fd:
         data = json.load(fd)
-    bandit_checks = bandit_run_check(
-    data, sha, dummy=environ.get("DUMMY_ANNOTATION")
-    )
+    bandit_checks = bandit_run_check(data, sha, dummy=environ.get("DUMMY_ANNOTATION"))
     return json.dumps(bandit_checks)
-    
