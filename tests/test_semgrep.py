@@ -12,7 +12,7 @@ expected_results = {
     "conclusion": "failure",
     "output": {
         "title": "Semgrep: ",
-        "summary": 'Semgrep statistics: {"Total errors": 1, "Semgrep Version": "1.34.0", "paths scanned": 36}',
+        "summary": 'Semgrep statistics: {\n  "Total_errors": 1,\n  "Semgrep_Version": "1.34.0",\n  "paths_scanned": 36\n}',
         "text": "<add --verbose for a list of skipped paths>",
         "annotations": [
             {
