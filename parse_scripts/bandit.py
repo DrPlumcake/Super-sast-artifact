@@ -23,22 +23,10 @@ def bandit_annotation(result):
     except (KeyError, IndexError):
         end_line = result["line_number"]
 
-    start_column = 1
-    end_column = 1
-
-    if (
-        end_line == result["line_number"]
-        and "col_offset" in result
-        and "end_column" in result
-    ):
-        start_column = result["col_offset"]
-        end_column = result["end_col_offset"]
     d = dict(
         path=result["filename"],
         start_line=result["line_number"],
         end_line=end_line,
-        start_column=start_column,
-        end_column=end_column,
         annotation_level=bandit_to_gh_severity(result["issue_severity"]),
         title="Test: {test_name} id: {test_id}".format(**result),
         message="{issue_text} more info {more_info}".format(**result),

@@ -11,8 +11,6 @@
                 "path": "/Dockerfile",
                 "start_line": 3,
                 "end_line": 3,
-                "start_column": 1,
-                "end_column": 1,
                 "annotation_level": "failure",
                 "title": "CKV_DOCKER_7",
                 "message": "Ensure the base image uses a non latest version tag - More info: https://docs.paloaltonetworks.com/content/techdocs/en_US/prisma/prisma-cloud/prisma-cloud-code-security-policy-reference/docker-policies/docker-policy-index/ensure-the-base-image-uses-a-non-latest-version-tag.html"
@@ -21,8 +19,6 @@
                 "path": "/.github/workflows/bandit.yml",
                 "start_line": 0,
                 "end_line": 1,
-                "start_column": 1,
-                "end_column": 1,
                 "annotation_level": "failure",
                 "title": "CKV2_GHA_1",
                 "message": "Ensure top-level permissions are not set to write-all"

@@ -17,8 +17,6 @@ def checkov_test(test):
         path=test["repo_file_path"],
         start_line=test["file_line_range"][0],
         end_line=test["file_line_range"][1],
-        start_column=1,
-        end_column=1,
         annotation_level=checkov_to_gh_severity(test["check_result"]["result"]),
         title=test["check_id"],
         message=message,
