@@ -12,7 +12,7 @@ def test_errors():
     errors = [bandit.bandit_error(error) for error in results["errors"]]
     assert errors[0]["path"] == "LICENSE"
     assert errors[1] == {
-        "path": "tests/py2.py",
+        "path": "tests/data/py2.py",
         "start_line": 2,
         "end_line": 2,
         "annotation_level": "failure",

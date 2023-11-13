@@ -52,7 +52,7 @@ def test_main_print():
     log.setLevel(logging.INFO)
     file_handler = logging.FileHandler(TEST_DIR / "super-sast-test.log", mode="w")
     log.addHandler(file_handler)
-    parse_tools(dict=json_arg_dict, log=log, log_path=LOG_DIR, test=True, local=True)
+    parse_tools(tools_d=json_arg_dict, log=log, log_path=LOG_DIR, test=True, local=True)
     with open(TEST_DIR / "super-sast-test.log", "r") as sast_fd:
         text = sast_fd.readlines()
     assert text == expected_text
@@ -71,11 +71,11 @@ def test_env_json():
         # var already set to json
         "CHECKOV_ARGS": " -o json",
     }
-    env_json(dict=json_arg_dict, tool="bandit", environ=env)
-    env_json(dict=json_arg_dict, tool="semgrep", environ=env)
-    env_json(dict=json_arg_dict, tool="safety", environ=env)
-    env_json(dict=json_arg_dict, tool="checkov", environ=env)
-    env_json(dict=json_arg_dict, tool="tool", environ=env)
+    env_json(tools_e=json_arg_dict, tool="bandit", environ=env)
+    env_json(tools_e=json_arg_dict, tool="semgrep", environ=env)
+    env_json(tools_e=json_arg_dict, tool="safety", environ=env)
+    env_json(tools_e=json_arg_dict, tool="checkov", environ=env)
+    env_json(tools_e=json_arg_dict, tool="tool", environ=env)
     assert env == {
         "BANDIT_ARGS": " -f json",
         "TOOL_ARGS": "",

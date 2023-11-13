@@ -14,7 +14,7 @@ from request import gh
 # Log to stdout
 # for both stdout and stderr.
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.DEBUG,
     format="%(asctime)s %(levelname)s %(message)s",
     datefmt="%Y-%m-%dT%H:%M:%S",
     handlers=[
@@ -24,12 +24,12 @@ logging.basicConfig(
 log = logging.getLogger(__name__)
 
 
-def env_json(dict, tool, environ=environ):
-    value_tool = dict.get(tool, "None")
-    if value_tool == "None":
+def env_json(tools_e, tool, environ=environ):
+    value_tool = tools_e.get(tool, "")
+    if not value_tool:
         return
-    value = value_tool.get("args", "None")
-    if value == "None":
+    value = value_tool.get("args", "")
+    if not value:
         return
     var = f"{tool.upper()}_ARGS"
     if value.strip() not in environ.get(var, value):
@@ -39,8 +39,8 @@ def env_json(dict, tool, environ=environ):
         environ[var] = value
 
 
-def parse_tools(dict, log, log_path, test=False, local=False):
-    for tool, tool_setup in dict.items():
+def parse_tools(tools_d, log, log_path, test=False, local=False):
+    for tool, tool_setup in tools_d.items():
         log_file_name = f"{tool}.log"
         log_file_path = Path(log_path) / log_file_name
         if tool not in ["bandit", "safety", "semgrep", "checkov"]:
@@ -59,9 +59,7 @@ def parse_tools(dict, log, log_path, test=False, local=False):
         if local:
             log.info(f"{tool} Request skipped for local testing")
             if not test:
-                log.setLevel(logging.DEBUG)
                 log.debug(f"Result: {tool_checks}")
-                log.setLevel(logging.INFO)
             continue
 
         if not test:
@@ -74,9 +72,7 @@ def parse_tools(dict, log, log_path, test=False, local=False):
             log.info("Request Status: %s %s %s", res.status_code, res.content, res.url)
 
         if not local:
-            log.setLevel(logging.DEBUG)
             log.debug(f"Result: {tool_checks}")
-            log.setLevel(logging.INFO)
 
 
 if __name__ == "__main__":
@@ -157,7 +153,7 @@ if __name__ == "__main__":
         _copy_java_validators()
         run_all = environ.get("RUN_ALL_TOOLS", "true").lower() == "true"
         for tool, command in TOOLS_MAP.items():
-            env_json(dict=json_arg_dict, tool=tool)
+            env_json(tools_e=json_arg_dict, tool=tool)
             status = run_sast(
                 tool,
                 command,
@@ -181,7 +177,7 @@ if __name__ == "__main__":
             )
 
         parse_tools(
-            dict=json_arg_dict, log=log, log_path=LOG_DIR, test=False, local=local
+            tools_d=json_arg_dict, log=log, log_path=LOG_DIR, test=False, local=local
         )
 
         log.info("Annotations succesfully sendend to PR: Process Completed\n")
