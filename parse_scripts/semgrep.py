@@ -4,16 +4,19 @@ from pathlib import Path
 
 JSON_DIR = Path(__file__).parent.parent / "tests/json"
 
-severity_converter = {
+SEVERITY_MAP = {
     "info": "notice",
     "warn": "warning",
+    "err": "failure",
 }
 
 
-def semgrep_to_gh_severity(severity):
+def gh_severity(severity):
+    if ret := SEVERITY_MAP.get(severity.lower()):
+        return ret
     if severity.startswith("err"):
         return "failure"
-    return severity_converter.get(severity)
+    raise NotImplementedError(f"Severity {severity} not implemented in {SEVERITY_MAP}")
 
 
 def semgrep_message(error):
@@ -36,7 +39,7 @@ def semgrep_span(entry, span):
         end_line=end_line,
         start_column=start_column,
         end_column=end_column,
-        annotation_level=semgrep_to_gh_severity(entry["level"]),
+        annotation_level=gh_severity(entry["level"]),
         title=entry["type"],
         message=semgrep_message(entry),
     )

@@ -1,11 +1,13 @@
 import json
 from datetime import datetime, timezone
 
-to_gh_sev = {"FAILED": "failure", "PASSED": "notice"}
+SEVERITY_MAP = {"FAILED": "failure", "PASSED": "notice"}
 
 
-def checkov_to_gh_severity(severity):
-    return to_gh_sev.get(severity)
+def gh_severity(severity):
+    if ret := SEVERITY_MAP.get(severity):
+        return ret
+    raise NotImplementedError(f"Severity {severity} not implemented in {SEVERITY_MAP}")
 
 
 def checkov_test(test):
@@ -17,7 +19,7 @@ def checkov_test(test):
         path=test["repo_file_path"],
         start_line=test["file_line_range"][0],
         end_line=test["file_line_range"][1],
-        annotation_level=checkov_to_gh_severity(test["check_result"]["result"]),
+        annotation_level=gh_severity(test["check_result"]["result"]),
         title=test["check_id"],
         message=message,
     )
