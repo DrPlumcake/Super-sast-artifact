@@ -1,6 +1,6 @@
-from pathlib import Path
-from datetime import datetime, timezone
 import json
+from datetime import datetime, timezone
+
 
 def safety_to_gh_severity(safety_severity):
     if safety_severity == "cvssv2" or safety_severity == "cvssv3":
@@ -8,8 +8,8 @@ def safety_to_gh_severity(safety_severity):
     else:
         return "notice"
 
+
 def vulnerability(data, entry_name, entry_num):
-    
     vuln = data["vulnerabilities"][entry_num]
     severity = vuln["severity"]
     # Message contains also other links
@@ -28,14 +28,18 @@ def vulnerability(data, entry_name, entry_num):
     )
     return d
 
+
 def vulnerabilities_to_annotations(data):
     vulns = []
     counter = 0
     for vuln in data["vulnerabilities"]:
-        element = vulnerability(data=data, entry_name=vuln["package_name"], entry_num=counter)
+        element = vulnerability(
+            data=data, entry_name=vuln["package_name"], entry_num=counter
+        )
         vulns.append(element)
         counter = counter + 1
     return vulns
+
 
 def statistics(data):
     stats = {
@@ -53,6 +57,7 @@ def statistics(data):
     }
     return stats
 
+
 def results(data, github_sha=None):
     safety_vulns = vulnerabilities_to_annotations(data)
     conclusion = "success"
@@ -62,17 +67,14 @@ def results(data, github_sha=None):
         title = f"Safety: {len(safety_vulns)} vulnerabilities found"
     summary = f"""Statistics: {json.dumps(statistics(data["report_meta"]), indent=2)}"""
     results = {
-        "name" : "Safety Comments",
+        "name": "Safety Comments",
         "head_sha": github_sha,
         "completed_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "conclusion": conclusion,
-        "output": {
-            "title": title,
-            "summary": summary,
-            "annotations": safety_vulns
-        },
+        "output": {"title": title, "summary": summary, "annotations": safety_vulns},
     }
     return results
+
 
 def parse(log_path, sha=None):
     with open(log_path, "r") as safety_fd:
