@@ -1,7 +1,7 @@
-import json
 from pathlib import Path
 
 import parse_scripts.semgrep
+from parse_scripts.util import json_load
 
 DATA_DIR = Path(__file__).parent / "json"
 
@@ -30,10 +30,8 @@ expected_results = {
 }
 
 
-def test_semgrep():
-    out_file = DATA_DIR / "semgrep.json"
-    output = out_file.read_text()
-    data = json.loads(output)
+def test_parse_data():
+    data = json_load(DATA_DIR / "semgrep.json")
     actual_results = parse_scripts.semgrep.parse_data(data, "stuff")
     actual_results["completed_at"] = "2023-11-09T15:29:33.821590Z"
     assert expected_results == actual_results

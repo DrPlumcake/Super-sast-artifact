@@ -1,8 +1,7 @@
 import json
 from datetime import datetime, timezone
-from pathlib import Path
 
-JSON_DIR = Path(__file__).parent.parent / "tests/json"
+from parse_scripts.util import json_load
 
 SEVERITY_MAP = {
     "info": "notice",
@@ -113,7 +112,6 @@ def only_json(log):
 
 def parse(log_path, sha=None):
     only_json(log_path)
-    with open(log_path, "r") as log:
-        data = json.load(log)
+    data = json_load(log_path)
     semgrep_data = parse_data(data, sha)
     return json.dumps(semgrep_data)

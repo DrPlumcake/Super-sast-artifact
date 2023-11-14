@@ -4,6 +4,8 @@ from datetime import datetime, timezone
 from os import environ
 from pathlib import Path
 
+from parse_scripts.util import json_load
+
 # Maps bandit severity to github annotation_level
 # see: https://docs.github.com/en/rest/reference/checks#create-a-check-run
 SEVERITY_MAP = {
@@ -120,7 +122,6 @@ def only_json(log):
 
 def parse(log, sha=None):
     only_json(log)
-    with open(log, "r") as fd:
-        data = json.load(fd)
+    data = json_load(log)
     bandit_checks = bandit_run_check(data, sha, dummy=environ.get("DUMMY_ANNOTATION"))
     return json.dumps(bandit_checks)

@@ -1,6 +1,8 @@
 import json
 from datetime import datetime, timezone
 
+from parse_scripts.util import json_load
+
 SEVERITY_MAP = {"FAILED": "failure", "PASSED": "notice"}
 
 
@@ -63,7 +65,6 @@ def checkov_results(log, github_sha):
 
 
 def parse(log_path, sha=None):
-    with open(log_path, "r") as fd:
-        data = json.load(fd)
+    data = json_load(log_path)
     annotations = checkov_results(log=data, github_sha=sha)
     return json.dumps(annotations)
