@@ -1,3 +1,4 @@
+import ast
 import json
 from datetime import datetime, timezone
 from os import environ
@@ -36,18 +37,16 @@ def bandit_annotation(result):
 
 
 def bandit_error(error):
-    from ast import parse
-
     title = "Error processing file (not a python file?)"
     start_line, end_line = 1, 1
     message = error["reason"]
     try:
-        parse(Path(error["filename"]).read_text())
+        ast.parse(Path(error["filename"]).read_text())
     except SyntaxError as e:
         title = "invalid syntax"
         end_line = start_line = e.lineno
         message = e.msg
-    except Exception as e:  # nosec - I really want to ignore further exceptions here.
+    except Exception:  # nosec - I really want to ignore further exceptions here.
         # Use default error values
         pass
 

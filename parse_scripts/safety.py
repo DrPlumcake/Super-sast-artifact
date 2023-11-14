@@ -43,17 +43,16 @@ def vulnerabilities_to_annotations(data):
 
 def statistics(data):
     stats = {
-        "SCANNED": data["scanned"],
-        "SAFETY_VERSION": data["safety_version"],
-        "TIMESTAP": data["timestamp"],
+        "OS_TYPE": data["telemetry"]["os_type"],
         "PACKAGES_FOUND": data["packages_found"],
+        "PYTHON_VERSION": data["telemetry"]["python_version"],
+        "REMEDIATIONS_RECOMMENDED": data["remediations_recommended"],
+        "SAFETY_COMMAND": data["telemetry"]["safety_command"],
+        "SAFETY_VERSION": data["telemetry"]["safety_version"] or data["safety_version"],
+        "SCANNED": data["scanned"],
+        "TIMESTAP": data["timestamp"],
         "VULNERABILITIES_FOUND": data["vulnerabilities_found"],
         "VULNERABILITIES_IGNORED": data["vulnerabilities_ignored"],
-        "REMEDIATIONS_RECOMMENDED": data["remediations_recommended"],
-        "OS_TYPE": data["telemetry"]["os_type"],
-        "PYTHON_VERSION": data["telemetry"]["python_version"],
-        "SAFETY_COMMAND": data["telemetry"]["safety_command"],
-        "SAFETY_VERSION": data["telemetry"]["safety_version"],
     }
     return stats
 
