@@ -44,7 +44,7 @@ def bandit_error(error):
     try:
         parse(Path(error["filename"]).read_text())
     except SyntaxError as e:
-        title, _ = e.args
+        title = "invalid syntax"
         end_line = start_line = e.lineno
         message = e.msg
     except Exception as e:  # nosec - I really want to ignore further exceptions here.

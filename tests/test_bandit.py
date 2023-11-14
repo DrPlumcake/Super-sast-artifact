@@ -17,7 +17,7 @@ def test_errors():
         "end_line": 2,
         "annotation_level": "failure",
         "title": "invalid syntax",
-        "message": "Missing parentheses in call to 'print'. Did you mean print(\"ciao\")?",
+        "message": "Missing parentheses in call to 'print'. Did you mean print(...)?",
     }
 
 
