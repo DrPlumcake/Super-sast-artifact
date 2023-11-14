@@ -45,12 +45,12 @@ def semgrep_span(entry, span):
 
 def summary(data):
     d = {
-        "Total errors": len(data["errors"]),
-        "Semgrep Version": data["version"],
-        "paths scanned": len(data["paths"]["scanned"]),
+        "Total_errors": len(data["errors"]),
+        "Semgrep_Version": data["version"],
+        "paths_scanned": len(data["paths"]["scanned"]),
     }
 
-    return f"""Semgrep statistics: {json.dumps(d)}"""
+    return f"""Semgrep statistics: {json.dumps(d, indent=2)}"""
 
 
 def semgrep_entries(entry):
@@ -58,8 +58,10 @@ def semgrep_entries(entry):
 
 
 def semgrep_errors(data):
+    errors_list = []
     for error in data["errors"]:
-        return semgrep_entries(error)
+        errors_list.extend(semgrep_entries(error))
+    return errors_list
 
 
 def parse_data(log, github_sha=None):

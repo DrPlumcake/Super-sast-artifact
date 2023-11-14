@@ -1,0 +1,17 @@
+version: '3.9'
+services:
+  test:
+      build: .
+      read_only: false
+      user: "${UID}"
+      volumes:
+      - .:/code
+      - /tmp
+      environment:
+      - M2_HOME=/tmp  # Store maven packages in the shared folder.
+      - HOME=/tmp
+      - USER=nobody
+      - BANDIT_CONFIG_FILE=.bandit.yml
+      - LOCAL=true
+      working_dir: /code
+      entrypoint: ["tox"]

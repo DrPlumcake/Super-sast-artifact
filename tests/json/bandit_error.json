@@ -5,7 +5,7 @@
       "reason": "syntax error while parsing AST from file"
     },
     {
-      "filename": "tests/py2.py",
+      "filename": "tests/data/py2.py",
       "reason": "syntax error while parsing AST from file"
     }
   ],

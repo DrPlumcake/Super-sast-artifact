@@ -10,12 +10,11 @@ ADD entrypoint.sh /
 ADD sast_to_log.py /
 
 RUN mkdir parse_scripts
-ADD parse_scripts/* /parse_scripts
+COPY parse_scripts/* /parse_scripts
 ADD request.py /
 
 RUN chmod +x /entrypoint.sh
 RUN chmod +x /sast_to_log.py
-RUN chmod +x /parse_scripts/*
 RUN chmod +x /main.py
 
 ENTRYPOINT ["/entrypoint.sh"]

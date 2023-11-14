@@ -1,0 +1,10 @@
+2023-11-11T10:56:06.849Z	[34mINFO[0m	Loaded /app/config/trivy.yaml
+2023-11-11T10:56:06.856Z	[34mINFO[0m	Need to update DB
+2023-11-11T10:56:06.856Z	[34mINFO[0m	DB Repository: ghcr.io/aquasecurity/trivy-db
+2023-11-11T10:56:06.856Z	[34mINFO[0m	Downloading DB...
+2023-11-11T10:56:18.173Z	[34mINFO[0m	Vulnerability scanning is enabled
+2023-11-11T10:56:18.173Z	[34mINFO[0m	Secret scanning is enabled
+2023-11-11T10:56:18.173Z	[34mINFO[0m	If your scanning is slow, please try '--scanners vuln' to disable secret scanning
+2023-11-11T10:56:18.173Z	[34mINFO[0m	Please see also https://aquasecurity.github.io/trivy/v0.46/docs/scanner/secret/#recommendation for faster secret detection
+2023-11-11T10:56:43.562Z	[34mINFO[0m	Number of language-specific files: 1
+2023-11-11T10:56:43.562Z	[34mINFO[0m	Detecting pip vulnerabilities...

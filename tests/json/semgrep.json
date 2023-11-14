@@ -1,0 +1,68 @@
+{
+    "errors": [
+        {
+            "code": 3,
+            "level": "warn",
+            "message": "Syntax error at line .github/workflows/test.yml:31:\n When parsing a snippet as Bash for metavariable-pattern in rule 'yaml.github-actions.security.curl-eval.curl-eval'",
+            "path": ".github/workflows/test.yml",
+            "spans": [
+              {
+                "end": {
+                  "col": 117,
+                  "line": 31
+                },
+                "file": ".github/workflows/test.yml",
+                "start": {
+                  "col": 114,
+                  "line": 31
+                }
+              }
+            ],
+            "type": "Syntax error"
+          }
+    ],
+    "paths": {
+        "_comment": "<add --verbose for a list of skipped paths>",
+        "scanned": [
+          ".bandit.yaml",
+          ".cache/python-entrypoints/83950e9fe1625b46b6509bf42a3dc4082706522251136ab44a6d115a420d5715",
+          ".cache/python-entrypoints/961be655a4cea042e6d4e756befc586736de6ec6af40ab459e081805342eee5b",
+          ".cache/python-entrypoints/c40d23beb9713ea289902d3caf73dcacfaad743b2c4af7003295edad9154aaea",
+          ".cache/python-entrypoints/cfad95d40e1a94e6de634595a03125f9a301d13fad02e79540bba28a8d537d1e",
+          ".cache/python-entrypoints/fd72df2cac701cd5113157993b72d68421c22c52c95ca0291ce50db092ba6673",
+          ".cache/semgrep_version",
+          ".github/ISSUE_TEMPLATE/bug_report.md",
+          ".github/ISSUE_TEMPLATE/custom.md",
+          ".github/ISSUE_TEMPLATE/feature_request.md",
+          ".github/workflows/test.yml",
+          ".gitignore",
+          ".pre-commit-config.yaml",
+          ".semgrepignore",
+          "Dockerfile",
+          "LICENSE",
+          "action.yml",
+          "entrypoint.sh",
+          "main.py",
+          "parse_scripts/__init__.py",
+          "parse_scripts/bandit.py",
+          "parse_scripts/checkov.py",
+          "parse_scripts/safety.py",
+          "parse_scripts/semgrep.py",
+          "request.py",
+          "requirements-dev.txt",
+          "requirements.txt",
+          "sast_to_log.py",
+          "security_report.txt",
+          "tests/canary.py",
+          "tests/py2.py",
+          "tests/test_bandit.py",
+          "tests/test_main.py",
+          "tests/test_parser.py",
+          "tests/test_semgrep.py",
+          "tox.ini"
+        ]
+      },
+    "results": [
+    ],
+    "version": "1.34.0"
+}

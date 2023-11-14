@@ -14,7 +14,7 @@ from request import gh
 # Log to stdout
 # for both stdout and stderr.
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.DEBUG,
     format="%(asctime)s %(levelname)s %(message)s",
     datefmt="%Y-%m-%dT%H:%M:%S",
     handlers=[
@@ -24,19 +24,55 @@ logging.basicConfig(
 log = logging.getLogger(__name__)
 
 
-def env_json(tool, environ=environ):
-    value_tool = json_arg_dict.get(tool, "None")
-    if value_tool == "None":
+def env_json(tools_e, tool, environ=environ):
+    value_tool = tools_e.get(tool, "")
+    if not value_tool:
         return
-    value = value_tool.get("args", "None")
-    if value == "None":
+    value = value_tool.get("args", "")
+    if not value:
         return
     var = f"{tool.upper()}_ARGS"
-    if environ.get(var, value) != value:
+    if value.strip() not in environ.get(var, value):
         env = environ.get(var, value)
         environ[var] = env + value
     else:
         environ[var] = value
+
+
+def parse_tools(tools_d, log, log_path, test=False, local=False):
+    for tool, tool_setup in tools_d.items():
+        log_file_name = f"{tool}.log"
+        log_file_path = Path(log_path) / log_file_name
+        if tool not in ["bandit", "safety", "semgrep", "checkov"]:
+            log.info(f"Sorry, annotations for {tool} are not available")
+            continue
+        if not Path(log_file_path).exists():
+            # File is empty
+            log.error(f"{log_file_name} does not exists")
+            continue
+        if Path(log_file_path).stat().st_size == 0:
+            log.info(f"{log_file_name} is empty. Skipping parsing")
+            continue
+        # tool_checks must be a Json object ready for request
+        parse_function = tool_setup["parse"].parse
+        tool_checks = parse_function(log_file_path, environ.get("GITHUB_SHA"))
+        if local:
+            log.info(f"{tool} Request skipped for local testing")
+            if not test:
+                log.debug(f"Result: {tool_checks}")
+            continue
+
+        if not test:
+            res = gh(
+                u_post,
+                method="POST",
+                data=tool_checks,
+                token=environ["GITHUB_TOKEN"],
+            )
+            log.info("Request Status: %s %s %s", res.status_code, res.content, res.url)
+
+        if not local:
+            log.debug(f"Result: {tool_checks}")
 
 
 if __name__ == "__main__":
@@ -117,7 +153,7 @@ if __name__ == "__main__":
         _copy_java_validators()
         run_all = environ.get("RUN_ALL_TOOLS", "true").lower() == "true"
         for tool, command in TOOLS_MAP.items():
-            env_json(tool)
+            env_json(tools_e=json_arg_dict, tool=tool)
             status = run_sast(
                 tool,
                 command,
@@ -140,36 +176,9 @@ if __name__ == "__main__":
                 **environ
             )
 
-        for tool, tool_setup in json_arg_dict.items():
-            log_file = f"{tool}.log"
-            LOG_FILE = Path(LOG_DIR) / log_file
-            if tool not in ["bandit", "safety", "semgrep", "checkov"]:
-                log.info(f"Sorry, annotations for {tool} are not available")
-                continue
-            if not Path(LOG_FILE).exists():
-                # File is empty
-                log.error(f"{LOG_FILE} does not exists")
-                continue
-            if Path(LOG_FILE).stat().st_size == 0:
-                log.info(f"{log_file} is empty. Skipping parsing")
-                continue
-            # tool_checks must be a Json object ready for request
-            parse_function = tool_setup["parse"].parse
-            tool_checks = parse_function(LOG_FILE, environ.get("GITHUB_SHA"))
-            if local:
-                log.info(f"{tool} Request skipped for local testing")
-                log.setLevel(logging.DEBUG)
-                log.debug(f"Result: {tool_checks}")
-                log.setLevel(logging.INFO)
-                continue
-
-            res = gh(
-                u_post,
-                method="POST",
-                data=tool_checks,
-                token=environ["GITHUB_TOKEN"],
-            )
-            log.info("Request Status: %s %s %s", res.status_code, res.content, res.url)
+        parse_tools(
+            tools_d=json_arg_dict, log=log, log_path=LOG_DIR, test=False, local=local
+        )
 
         log.info("Annotations succesfully sendend to PR: Process Completed\n")
         exit(0)

@@ -1,0 +1,11 @@
+Sorry, annotations for trivy_config are not available
+Sorry, annotations for trivy_filesystem are not available
+bandit.log does not exists
+safety.log is empty. Skipping parsing
+Sorry, annotations for kubescape are not available
+checkov Request skipped for local testing
+semgrep.log is empty. Skipping parsing
+Sorry, annotations for spotbugs are not available
+Sorry, annotations for owasp_dependency_check are not available
+Sorry, annotations for spotless_check are not available
+Sorry, annotations for spotless_apply are not available

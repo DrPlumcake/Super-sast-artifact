@@ -1,0 +1,17 @@
+2023-11-11T10:55:51.889Z	[34mINFO[0m	Loaded /app/config/trivy.yaml
+2023-11-11T10:55:51.904Z	[34mINFO[0m	Misconfiguration scanning is enabled
+2023-11-11T10:55:51.904Z	[34mINFO[0m	Need to update the built-in policies
+2023-11-11T10:55:51.904Z	[34mINFO[0m	Downloading the built-in policies...
+44.66 KiB / 44.66 KiB [-----------------------------------------------------------] 100.00% ? p/s 0s2023-11-11T10:56:06.179Z	[34mINFO[0m	Detected config files: 17
+
+Dockerfile (dockerfile)
+=======================
+Tests: 19 (SUCCESSES: 18, FAILURES: 1, EXCEPTIONS: 0)
+Failures: 1 (HIGH: 1, CRITICAL: 0)
+
+HIGH: Specify at least 1 USER command in Dockerfile with non-root user as argument
+════════════════════════════════════════
+Running containers with 'root' user can lead to a container escape situation. It is a best practice to run containers as non-root users, which can be done by adding a 'USER' statement to the Dockerfile.
+
+See https://avd.aquasec.com/misconfig/ds002
+────────────────────────────────────────
