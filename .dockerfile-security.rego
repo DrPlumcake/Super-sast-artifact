@@ -1,3 +1,4 @@
+# See https://github.com/par-tec/ml-playground/blob/main/.dockerfile-security.rego
 package main
 
 # Do Not store secrets in ENV variables
@@ -21,12 +22,19 @@ deny[msg] {
     msg = sprintf("Line %d: Potential secret in ENV key found: %s", [i, val])
 }
 
-# Only use trusted base images
+# Only use base images from trusted registries
+trusted_registries = [
+    "registry.access.redhat.com",
+    "ghcr.io/par-tec",
+    "docker.io/library",
+]
 deny_untrusted_base_image[msg] {
     input[i].Cmd == "from"
-    val := split(input[i].Value[0], "/")
-    count(val) > 1
-    msg = sprintf("Line %d: use a trusted base image", [i])
+    val := split(input[i].Value[0], " ")
+    trusted_registries_re = concat("|", trusted_registries)
+    ret := regex.match(trusted_registries_re, lower(val[0]))
+    not ret
+    msg = sprintf("Line %d: use trusted, FQDN base image: %s", [i, ret])
 }
 
 # Do not use 'latest' tag for base imagedeny[msg] {
@@ -48,8 +56,6 @@ deny_curl_bashing[msg] {
 
 # Do not upgrade your system packages
 upgrade_commands = [
-    "apk upgrade",
-    "apt-get upgrade",
     "dist-upgrade",
 ]
 
@@ -57,7 +63,7 @@ deny[msg] {
     input[i].Cmd == "run"
     val := concat(" ", input[i].Value)
     contains(val, upgrade_commands[_])
-    msg = sprintf("Line: %d: Do not upgrade your system packages", [i])
+    msg = sprintf("Line: %d: Do not upgrade your distribution", [i])
 }
 
 # Do not use ADD if possible
