@@ -5,7 +5,7 @@
       "reason": "syntax error while parsing AST from file"
     },
     {
-      "filename": "tests/data/py2.py",
+      "filename": "tests/data/python-01/py2.py",
       "reason": "syntax error while parsing AST from file"
     }
   ],
@@ -43,7 +43,7 @@
   "results": [
     {
       "code": "2 \n3 print(randint(0, 10))\n4 \n",
-      "filename": "tests/canary.py",
+      "filename": "tests/data/python-01/canary.py",
       "issue_confidence": "HIGH",
       "issue_severity": "LOW",
       "issue_text": "Standard pseudo-random generators are not suitable for security/cryptographic purposes.",
@@ -57,7 +57,7 @@
     },
     {
       "code": "4 \n5 password = \"secret\"\n6 \n7 a = eval(\"\"\"\n",
-      "filename": "tests/canary.py",
+      "filename": "tests/data/python-01/canary.py",
       "issue_confidence": "MEDIUM",
       "issue_severity": "LOW",
       "issue_text": "Possible hardcoded password: 'secret'",
@@ -72,7 +72,7 @@
     },
     {
       "code": "6 \n7 a = eval(\"\"\"\n8     3 + 2 \\\n9     + randint(0, 10)\n10 \n11 \"\"\")\n12 assert a\n",
-      "filename": "tests/canary.py",
+      "filename": "tests/data/python-01/canary.py",
       "issue_confidence": "HIGH",
       "issue_severity": "MEDIUM",
       "issue_text": "Use of possibly insecure function - consider using safer ast.literal_eval.",
@@ -90,7 +90,7 @@
     },
     {
       "code": "11 \"\"\")\n12 assert a\n",
-      "filename": "tests/canary.py",
+      "filename": "tests/data/python-01/canary.py",
       "issue_confidence": "HIGH",
       "issue_severity": "LOW",
       "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
