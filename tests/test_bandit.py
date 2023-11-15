@@ -1,14 +1,14 @@
-import json
 from pathlib import Path
 
 from parse_scripts import bandit
+from parse_scripts.util import json_load
 
 TEST_DIR = Path(__file__).parent
 JSON_DIR = TEST_DIR / "json"
 
 
 def test_errors():
-    results = json.loads(Path(JSON_DIR / "bandit_error.json").read_text())
+    results = json_load(JSON_DIR / "bandit_error.json")
     errors = [bandit.bandit_error(error) for error in results["errors"]]
     assert errors[0]["path"] == "LICENSE"
     assert errors[1] == {
@@ -22,13 +22,13 @@ def test_errors():
 
 
 def test_annotations():
-    results = json.loads(Path(JSON_DIR / "bandit.json").read_text())
-    annotations = bandit.bandit_annotations(results)
+    data = json_load(JSON_DIR / "bandit.json")
+    annotations = bandit.bandit_annotations(data)
     assert annotations[0]["path"] == "canary.py"
     assert annotations[0]["start_line"] == 3
 
 
 def test_run_check():
-    results = json.loads(Path(JSON_DIR / "bandit.json").read_text())
-    run_check_body = bandit.bandit_run_check(results)
+    data = json_load(JSON_DIR / "bandit.json")
+    run_check_body = bandit.bandit_run_check(data)
     assert run_check_body["conclusion"] == "failure"

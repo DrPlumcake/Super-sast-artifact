@@ -4,18 +4,22 @@ from datetime import datetime, timezone
 from os import environ
 from pathlib import Path
 
+from parse_scripts.util import json_load
 
-def bandit_to_gh_severity(bandit_severity):
-    # Maps bandit severity to github annotation_level
-    # see: https://docs.github.com/en/rest/reference/checks#create-a-check-run
-    bandit_severity = bandit_severity.lower()
-    bandit_severity_map = {
-        "low": "notice",
-        "medium": "warning",
-        "high": "failure",
-        "undefined": "notice",
-    }
-    return bandit_severity_map[bandit_severity]
+# Maps bandit severity to github annotation_level
+# see: https://docs.github.com/en/rest/reference/checks#create-a-check-run
+SEVERITY_MAP = {
+    "low": "notice",
+    "medium": "warning",
+    "high": "failure",
+    "undefined": "notice",
+}
+
+
+def gh_severity(severity):
+    if ret := SEVERITY_MAP.get(severity.lower()):
+        return ret
+    raise NotImplementedError(f"Severity {severity} not implemented in {SEVERITY_MAP}")
 
 
 def bandit_annotation(result):
@@ -28,7 +32,7 @@ def bandit_annotation(result):
         path=result["filename"],
         start_line=result["line_number"],
         end_line=end_line,
-        annotation_level=bandit_to_gh_severity(result["issue_severity"]),
+        annotation_level=gh_severity(result["issue_severity"]),
         title="Test: {test_name} id: {test_id}".format(**result),
         message="{issue_text} more info {more_info}".format(**result),
     )
@@ -118,7 +122,6 @@ def only_json(log):
 
 def parse(log, sha=None):
     only_json(log)
-    with open(log, "r") as fd:
-        data = json.load(fd)
+    data = json_load(log)
     bandit_checks = bandit_run_check(data, sha, dummy=environ.get("DUMMY_ANNOTATION"))
     return json.dumps(bandit_checks)

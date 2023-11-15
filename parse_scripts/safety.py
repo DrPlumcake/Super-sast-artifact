@@ -1,12 +1,16 @@
 import json
 from datetime import datetime, timezone
 
+SEVERITY_MAP = {
+    "cvssv2": "warning",
+    "cvssv3": "warning",
+}
 
-def safety_to_gh_severity(safety_severity):
-    if safety_severity == "cvssv2" or safety_severity == "cvssv3":
-        return "warning"
-    else:
-        return "notice"
+
+def gh_severity(severity):
+    if ret := SEVERITY_MAP.get(severity.lower()):
+        return ret
+    return "notice"
 
 
 def vulnerability(data, entry_name, entry_num):
@@ -22,7 +26,7 @@ def vulnerability(data, entry_name, entry_num):
         start_line=1,
         end_line=1,
         # not sure about this
-        annotation_level=safety_to_gh_severity(severity),
+        annotation_level=gh_severity(severity),
         title=vuln["CVE"],
         message=message,
     )
