@@ -15,4 +15,5 @@ jobs:
       run: |
         pwd
         ls -lah
+        echo UID=$(id -u) >> .env
         docker-compose run --rm test
