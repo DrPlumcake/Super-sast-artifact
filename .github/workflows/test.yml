@@ -12,9 +12,8 @@ jobs:
       run: |
         docker-compose build --pull --force-rm test
     - name: Test
-      env:
-        UID: ${{ env.UID }}
       run: |
         pwd
         ls -lah
+        echo UID=$(id -u) >> .env
         docker-compose run --rm test
