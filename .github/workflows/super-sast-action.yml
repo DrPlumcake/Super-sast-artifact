@@ -30,7 +30,6 @@ jobs:
     - name: Run Docker Image
       run: |
         ls -lah
-        chown -R "$(id -u)":"$(id -g)" $PWD
         docker run --name super-sast-artifact -v $PWD:/code -e M2_HOME=/code -e HOME=/code -e GITHUB_API_URL=${{ github.api_url }} -e GITHUB_REPOSITORY=${{ github.repository }} -e GITHUB_SHA=${{ github.sha }} -e INPUT_REPO_TOKEN=${{ github.token }} -w /code -u "$(id -u)" super-sast-action:0.6
 
     - uses: actions/upload-artifact@v3
