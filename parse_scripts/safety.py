@@ -1,14 +1,11 @@
 import json
 from datetime import datetime, timezone
 
-SEVERITY_MAP = {
-    "cvssv2": "warning",
-    "cvssv3": "warning",
-}
+SEVERITY_MAP = {"cvssv2": "warning", "cvssv3": "warning", None: "notice"}
 
 
 def gh_severity(severity):
-    if ret := SEVERITY_MAP.get(severity.lower()):
+    if ret := SEVERITY_MAP.get(severity):
         return ret
     return "notice"
 
@@ -20,6 +17,9 @@ def vulnerability(data, entry_name, entry_num):
     advisory = vuln["advisory"].split("\r\n")[0]
     url = vuln["more_info_url"]
     message = f"{advisory} - Other links:{url}"
+    title = vuln["package_name"]
+    if vuln["CVE"] is not None:
+        title = f"""{vuln["package_name"]} - {vuln["CVE"]}"""
     d = dict(
         path=data["affected_packages"][entry_name]["found"],
         # no code
@@ -27,7 +27,7 @@ def vulnerability(data, entry_name, entry_num):
         end_line=1,
         # not sure about this
         annotation_level=gh_severity(severity),
-        title=vuln["CVE"],
+        title=title,
         message=message,
     )
     return d
