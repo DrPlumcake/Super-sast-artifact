@@ -52,7 +52,7 @@ def statistics(data):
         "PYTHON_VERSION": data["telemetry"]["python_version"],
         "REMEDIATIONS_RECOMMENDED": data["remediations_recommended"],
         "SAFETY_COMMAND": data["telemetry"]["safety_command"],
-        "SAFETY_VERSION": data["telemetry"]["safety_version"] or data["safety_version"],
+        "SAFETY_VERSION": data["safety_version"],
         "SCANNED": data["scanned"],
         "TIMESTAP": data["timestamp"],
         "VULNERABILITIES_FOUND": data["vulnerabilities_found"],
