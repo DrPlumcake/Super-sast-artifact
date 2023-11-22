@@ -134,7 +134,9 @@ if __name__ == "__main__":
             "GITHUB_API_URL",
             "GITHUB_REPOSITORY",
             "GITHUB_SHA",
-            "GITHUB_TOKEN",
+            "INPUT_REPO_TOKEN",
+            "M2_HOME",
+            "HOME",
         }
         for var in REQUIRED_ENV:
             if var not in environ:
