@@ -1,5 +1,6 @@
 import json
 from datetime import datetime, timezone
+from os import environ
 
 SEVERITY_MAP = {"cvssv2": "warning", "cvssv3": "warning", None: "notice"}
 
@@ -61,12 +62,17 @@ def statistics(data):
     return stats
 
 
-def results(data, github_sha=None):
+def results(data, github_sha=None, dummy=None):
     safety_vulns = vulnerabilities_to_annotations(data)
     conclusion = "success"
     title = "Safety: No vulnerabilities found"
     if safety_vulns:
         conclusion = "failure"
+
+    if dummy:
+        conclusion = "neutral"
+        title = "Safety dummy run (always neutral)"
+
         title = f"Safety: {len(safety_vulns)} vulnerabilities found"
     summary = f"""Statistics: {json.dumps(statistics(data["report_meta"]), indent=2)}"""
     results = {
@@ -82,5 +88,5 @@ def results(data, github_sha=None):
 def parse(log_path, sha=None):
     with open(log_path, "r") as safety_fd:
         data = json.load(safety_fd)
-    safety_checks = results(data, sha)
+    safety_checks = results(data, sha, dummy=environ.get("INPUT_IGNORE_FAILURE"))
     return json.dumps(safety_checks)

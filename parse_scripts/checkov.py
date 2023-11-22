@@ -1,5 +1,6 @@
 import json
 from datetime import datetime, timezone
+from os import environ
 
 from parse_scripts.util import json_load
 
@@ -32,7 +33,7 @@ def checkov_entries(data):
     return [checkov_test(test) for test in data["results"]["failed_checks"]]
 
 
-def checkov_results(log, github_sha):
+def checkov_results(log, github_sha=None, dummy=None):
     dockerfile_checks = checkov_entries(log[0])
     github_checks = checkov_entries(log[1])
 
@@ -50,6 +51,10 @@ def checkov_results(log, github_sha):
 
     summary = f"""Total statistics:\n Check_Type: {check_type_0}\n{summary_0}\n\n Check_Type: {check_type_1}\n{summary_1}\n\n{url}"""
 
+    if dummy:
+        conclusion = "neutral"
+        title = "Checkov dummy run (always neutral)"
+
     results = {
         "name": "Checkov Comments",
         "head_sha": github_sha,
@@ -66,5 +71,7 @@ def checkov_results(log, github_sha):
 
 def parse(log_path, sha=None):
     data = json_load(log_path)
-    annotations = checkov_results(log=data, github_sha=sha)
+    annotations = checkov_results(
+        log=data, github_sha=sha, dummy=environ.get("INPUT_IGNORE_FAILURE")
+    )
     return json.dumps(annotations)
