@@ -1,6 +1,6 @@
 # FROM super-sast, copy-paste the Dockerfile is better?
 
-FROM ghcr.io/par-tec/super-sast as super-sast
+FROM ghcr.io/par-tec/super-sast:20231115-108-746a559 as super-sast
 
 FROM docker.io/library/python:3.11.1-alpine as base_python
 COPY --from=super-sast / /

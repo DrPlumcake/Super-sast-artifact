@@ -125,15 +125,16 @@ if __name__ == "__main__":
         "spotless_check": {},
         "spotless_apply": {},
     }
-    """
+
     REQUIRED_ENV = {"GITHUB_API_URL", "GITHUB_REPOSITORY", "GITHUB_SHA", "GITHUB_TOKEN"}
-    if not REQUIRED_ENV < set(environ):
-        log.warning(
-            "Missing one or more of the following environment variables",
-            REQUIRED_ENV - set(environ),
-        )
-        raise SystemExit(1)
-    """
+    for var in REQUIRED_ENV:
+        if var not in environ:
+            log.warning(
+                "Missing one or more of the following environment variables",
+                var,
+            )
+            raise SystemExit(1)
+
     try:
         if args.environs or args.dump_config:
             _show_environ(Path(args.config_dir), dump_config=args.dump_config)
