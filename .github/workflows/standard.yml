@@ -1,0 +1,39 @@
+name: Super-sast-Artifact
+
+on:
+    push:
+      branches: [ "*" ]
+    pull_request:
+      branches: [ "*" ]
+
+jobs:
+  standard:
+    runs-on: ubuntu-latest
+
+    env:
+      GITHUB_API_URL: ${{ github.api_url }}
+      GITHUB_REPOSITORY: ${{ github.repository }}
+      GITHUB_SHA: ${{ github.sha }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ]
+        python-version: [ '3.7' ]
+    name: super-sast-action v0.9 ${{ matrix.python-version }} ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: actions/super-sast-action@v0.9-alpha
+      with:
+        ignore_failure: true
+        bandit_config_file: ".bandit.yaml"
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        m2_home: "/code"
+        home: "/code"
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: super-sast-action_artifact
+        path: |
+          super-sast.log
+          log_dir/

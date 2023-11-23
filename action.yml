@@ -16,6 +16,7 @@ inputs:
     required: false
     default: false
 
+  # Is this still necessary?
   bandit_config_file:
     description: "The yaml config file to use"
     required: false
@@ -42,7 +43,7 @@ runs:
   using: "docker"
   image: "Dockerfile"
   args:
-    - "-v $PWD:/code"
+    - "-v $INPUT_PROJECT_PATH:/code"
     - "-w /code"
 
 branding:
