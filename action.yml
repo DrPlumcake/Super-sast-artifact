@@ -43,8 +43,9 @@ runs:
   using: "docker"
   image: "Dockerfile"
   args:
-    - "-v $INPUT_PROJECT_PATH:/code"
-    - "-w /code"
+    - -v $INPUT_PROJECT_PATH:/code
+    - -w /code
+    - -u "$(id -u)"
 
 branding:
   icon: "shield"
