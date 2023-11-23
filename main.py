@@ -188,8 +188,8 @@ if __name__ == "__main__":
         parse_tools(
             tools_d=json_arg_dict, log=log, log_path=LOG_DIR, test=False, local=local
         )
-
-        log.info("Annotations succesfully sendend to PR: Process Completed\n")
+        if not local:
+            log.info("Annotations succesfully sendend to PR: Process Completed\n")
         exit(0)
     except Exception as e:
         log.error(
