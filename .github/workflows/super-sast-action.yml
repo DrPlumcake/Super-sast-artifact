@@ -25,16 +25,16 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Build Docker image
-      run: docker build -t super-sast-action:0.6 .
+      run: docker build -t super-sast-action:1.0 .
 
     - name: Run Docker Image
       run: |
         ls -lah
-        docker run --name super-sast-artifact -v $PWD:/code -e M2_HOME=/code -e HOME=/code -e GITHUB_API_URL=${{ github.api_url }} -e GITHUB_REPOSITORY=${{ github.repository }} -e GITHUB_SHA=${{ github.sha }} -e INPUT_REPO_TOKEN=${{ github.token }} -w /code -u "$(id -u)" super-sast-action:0.6
+        docker run --name super-sast-action -v $PWD:/code -e INPUT_IGNORE_FAILURE=true -e INPUT_M2_HOME=/code -e INPUT_HOME=/code -e GITHUB_API_URL=${{ github.api_url }} -e GITHUB_REPOSITORY=${{ github.repository }} -e GITHUB_SHA=${{ github.sha }} -e INPUT_REPO_TOKEN=${{ github.token }} -w /code -u "$(id -u)" super-sast-action:1.0
 
     - uses: actions/upload-artifact@v3
       with:
-        name: super-sast-artifact
+        name: super-sast-action_artifact
         path: |
           super-sast.log
           log_dir/

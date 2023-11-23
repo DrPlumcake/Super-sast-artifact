@@ -1,5 +1,6 @@
 import json
 from datetime import datetime, timezone
+from os import environ
 
 from parse_scripts.util import json_load
 
@@ -66,7 +67,7 @@ def semgrep_errors(data):
     return errors_list
 
 
-def parse_data(log, github_sha=None):
+def parse_data(log, github_sha=None, dummy=False):
     conclusion = "success"
     title = "Semgrep: "
     semgrep_annotations = semgrep_errors(data=log)
@@ -76,6 +77,10 @@ def parse_data(log, github_sha=None):
         title.join(f"{len(semgrep_annotations)} errors found")
     else:
         title.join("no errors found")
+
+    if dummy:
+        conclusion = "neutral"
+        title = "Safety dummy run (always neutral)"
 
     text = None
     if "_comment" in log["paths"]:
@@ -113,5 +118,8 @@ def only_json(log):
 def parse(log_path, sha=None):
     only_json(log_path)
     data = json_load(log_path)
-    semgrep_data = parse_data(data, sha)
+    dummy = False
+    if environ.get("INPUT_IGNORE_FAILURE") == "true":
+        dummy = True
+    semgrep_data = parse_data(data, sha, dummy=dummy)
     return json.dumps(semgrep_data)

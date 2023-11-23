@@ -125,15 +125,27 @@ if __name__ == "__main__":
         "spotless_check": {},
         "spotless_apply": {},
     }
-    """
-    REQUIRED_ENV = {"GITHUB_API_URL", "GITHUB_REPOSITORY", "GITHUB_SHA", "GITHUB_TOKEN"}
-    if not REQUIRED_ENV < set(environ):
-        log.warning(
-            "Missing one or more of the following environment variables",
-            REQUIRED_ENV - set(environ),
-        )
-        raise SystemExit(1)
-    """
+
+    local = False
+    if environ.get("LOCAL") == "true":
+        local = True
+    if not local:
+        REQUIRED_ENV = {
+            "GITHUB_API_URL",
+            "GITHUB_REPOSITORY",
+            "GITHUB_SHA",
+            "INPUT_REPO_TOKEN",
+            "M2_HOME",
+            "HOME",
+        }
+        for var in REQUIRED_ENV:
+            if var not in environ:
+                log.warning(
+                    "Missing one or more of the following environment variables",
+                    var,
+                )
+                raise SystemExit(1)
+
     try:
         if args.environs or args.dump_config:
             _show_environ(Path(args.config_dir), dump_config=args.dump_config)
@@ -165,9 +177,6 @@ if __name__ == "__main__":
             sast_status[tool] = status
         log.info("All tools finished")
         log.info(sast_status)
-        local = False
-        if environ.get("LOCAL") == "true":
-            local = True
         if not local:
             u_patch = "{GITHUB_API_URL}/repos/{GITHUB_REPOSITORY}/commits/{GITHUB_SHA}/check-runs".format(
                 **environ

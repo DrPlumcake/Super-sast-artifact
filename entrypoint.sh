@@ -2,7 +2,13 @@
 
 echo "🔥🔥🔥🔥🔥Running security check🔥🔥🔥🔥🔥🔥"
 
-GITHUB_TOKEN=$INPUT_REPO_TOKEN python /main.py
+#env variables
+export GITHUB_TOKEN=$INPUT_REPO_TOKEN
+export M2_HOME=$INPUT_M2_HOME
+export HOME=$INPUT_HOME
+export BANDIT_CONFIG_FILE=$INPUT_BANDIT_CONFIG_FILE
+
+python /main.py
 
 if [ "$?" -eq 0 ]; then
     echo "🔥🔥🔥🔥Security check passed🔥🔥🔥🔥"
@@ -14,4 +20,4 @@ if $INPUT_IGNORE_FAILURE; then
     exit 0
 fi
 
-exit 0
+exit 1

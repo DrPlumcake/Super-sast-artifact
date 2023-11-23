@@ -1,8 +1,8 @@
 #
 # Forked from  ioggstream/bandit-report-artifacts
 #
-name: "super-sast with code annotations"
-description: "Github action to find common security issues in your project and get its report as a artifact."
+name: "super-sast-action"
+description: "Github action to find common security issues in your project and get its report as annotations and an artifact."
 author: "fantasticiniandrea@gmail.com"
 
 inputs:
@@ -16,7 +16,7 @@ inputs:
     required: false
     default: false
 
-  config_file:
+  bandit_config_file:
     description: "The yaml config file to use"
     required: false
     default: ""
@@ -28,9 +28,22 @@ inputs:
       [Learn more about `GITHUB_TOKEN`](https://help.github.com/en/actions/configuring-and-managing-workflows/authenticating-with-the-github_token#about-the-github_token-secret)
     default: ${{ github.token }}
 
+  m2_home:
+  description: "java validators will be installed in this directory"
+  required: false
+  default: "/code"
+
+  home:
+  description: ""
+  required: false
+  default: "/code"
+
 runs:
   using: "docker"
   image: "Dockerfile"
+  args:
+    - "-v $PWD:/code"
+    - "-w /code"
 
 branding:
   icon: "shield"
