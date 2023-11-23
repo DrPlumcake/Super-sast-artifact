@@ -18,8 +18,6 @@ RUN chmod +x /entrypoint.sh
 RUN chmod +x /sast_to_log.py
 RUN chmod +x /main.py
 
-USER 1000
-
 # Since this is a job container, we don't need an healthcheck.
 HEALTHCHECK NONE
 ENTRYPOINT ["/entrypoint.sh"]
