@@ -69,14 +69,16 @@ def results(data, github_sha=None, dummy=False):
     if safety_vulns:
         conclusion = "failure"
 
+    name = "Safety Comments"
     if dummy:
         conclusion = "neutral"
         title = "Safety dummy run (always neutral)"
+        name = "Safety dummy run"
 
     title = f"Safety: {len(safety_vulns)} vulnerabilities found"
     summary = f"""Statistics: {json.dumps(statistics(data["report_meta"]), indent=2)}"""
     results = {
-        "name": "Safety Comments",
+        "name": name,
         "head_sha": github_sha,
         "completed_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "conclusion": conclusion,

@@ -24,8 +24,8 @@ jobs:
         ignore_failure: true
         bandit_config_file: ".bandit.yaml"
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        m2_home: "/code"
-        home: "/code"
+        m2_home: "/github/workspace"
+        home: "/github/workspace"
         local: true
 
     - uses: actions/upload-artifact@v3
