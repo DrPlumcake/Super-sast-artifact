@@ -30,14 +30,14 @@ inputs:
     default: ${{ github.token }}
 
   m2_home:
-  description: "java validators will be installed in this directory"
-  required: false
-  default: "/code"
+    description: "java validators will be installed in this directory"
+    required: false
+    default: "/code"
 
   home:
-  description: ""
-  required: false
-  default: "/code"
+    description: ""
+    required: false
+    default: "/code"
 
 runs:
   using: "docker"
