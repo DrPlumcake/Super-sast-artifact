@@ -1,10 +1,6 @@
-name: Super-sast-Artifact
+name: super-sast-action
 
-on:
-    push:
-      branches: [ "*" ]
-    pull_request:
-      branches: [ "*" ]
+on: push
 
 jobs:
   standard:
@@ -23,7 +19,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - uses: actions/super-sast-action@v0.9-alpha
+    - uses: DrPlumcake/super-sast-action@v0.9-alpha
       with:
         ignore_failure: true
         bandit_config_file: ".bandit.yaml"
