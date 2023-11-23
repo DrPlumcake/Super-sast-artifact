@@ -26,6 +26,7 @@ jobs:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         m2_home: "/code"
         home: "/code"
+        local: true
 
     - uses: actions/upload-artifact@v3
       with:
