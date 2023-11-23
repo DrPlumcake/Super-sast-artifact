@@ -123,7 +123,8 @@ def only_json(log):
 def parse(log, sha=None):
     only_json(log)
     data = json_load(log)
-    bandit_checks = bandit_run_check(
-        data, sha, dummy=environ.get("INPUT_IGNORE_FAILURE")
-    )
+    dummy = False
+    if environ.get("INPUT_IGNORE_FAILURE") == "true":
+        dummy = True
+    bandit_checks = bandit_run_check(data, sha, dummy)
     return json.dumps(bandit_checks)

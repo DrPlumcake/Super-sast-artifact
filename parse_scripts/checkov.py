@@ -33,7 +33,7 @@ def checkov_entries(data):
     return [checkov_test(test) for test in data["results"]["failed_checks"]]
 
 
-def checkov_results(log, github_sha=None, dummy=None):
+def checkov_results(log, github_sha=None, dummy=False):
     dockerfile_checks = checkov_entries(log[0])
     github_checks = checkov_entries(log[1])
 
@@ -71,7 +71,8 @@ def checkov_results(log, github_sha=None, dummy=None):
 
 def parse(log_path, sha=None):
     data = json_load(log_path)
-    annotations = checkov_results(
-        log=data, github_sha=sha, dummy=environ.get("INPUT_IGNORE_FAILURE")
-    )
+    dummy = False
+    if environ.get("INPUT_IGNORE_FAILURE") == "true":
+        dummy = True
+    annotations = checkov_results(log=data, github_sha=sha, dummy=dummy)
     return json.dumps(annotations)

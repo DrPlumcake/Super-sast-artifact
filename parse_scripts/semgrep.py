@@ -67,7 +67,7 @@ def semgrep_errors(data):
     return errors_list
 
 
-def parse_data(log, github_sha=None, dummy=None):
+def parse_data(log, github_sha=None, dummy=False):
     conclusion = "success"
     title = "Semgrep: "
     semgrep_annotations = semgrep_errors(data=log)
@@ -118,5 +118,8 @@ def only_json(log):
 def parse(log_path, sha=None):
     only_json(log_path)
     data = json_load(log_path)
-    semgrep_data = parse_data(data, sha, dummy=environ.get("INPUT_IGNORE_FAILURE"))
+    dummy = False
+    if environ.get("INPUT_IGNORE_FAILURE") == "true":
+        dummy = True
+    semgrep_data = parse_data(data, sha, dummy=dummy)
     return json.dumps(semgrep_data)

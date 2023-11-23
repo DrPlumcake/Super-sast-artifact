@@ -62,7 +62,7 @@ def statistics(data):
     return stats
 
 
-def results(data, github_sha=None, dummy=None):
+def results(data, github_sha=None, dummy=False):
     safety_vulns = vulnerabilities_to_annotations(data)
     conclusion = "success"
     title = "Safety: No vulnerabilities found"
@@ -73,7 +73,7 @@ def results(data, github_sha=None, dummy=None):
         conclusion = "neutral"
         title = "Safety dummy run (always neutral)"
 
-        title = f"Safety: {len(safety_vulns)} vulnerabilities found"
+    title = f"Safety: {len(safety_vulns)} vulnerabilities found"
     summary = f"""Statistics: {json.dumps(statistics(data["report_meta"]), indent=2)}"""
     results = {
         "name": "Safety Comments",
@@ -88,5 +88,8 @@ def results(data, github_sha=None, dummy=None):
 def parse(log_path, sha=None):
     with open(log_path, "r") as safety_fd:
         data = json.load(safety_fd)
-    safety_checks = results(data, sha, dummy=environ.get("INPUT_IGNORE_FAILURE"))
+    dummy = False
+    if environ.get("INPUT_IGNORE_FAILURE") == "true":
+        dummy = True
+    safety_checks = results(data, sha, dummy=dummy)
     return json.dumps(safety_checks)

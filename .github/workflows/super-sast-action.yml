@@ -30,7 +30,7 @@ jobs:
     - name: Run Docker Image
       run: |
         ls -lah
-        docker run --name super-sast-action -v $PWD:/code -e INPUT_M2_HOME=/code -e INPUT_HOME=/code -e GITHUB_API_URL=${{ github.api_url }} -e GITHUB_REPOSITORY=${{ github.repository }} -e GITHUB_SHA=${{ github.sha }} -e INPUT_REPO_TOKEN=${{ github.token }} -w /code -u "$(id -u)" super-sast-action:1.0
+        docker run --name super-sast-action -v $PWD:/code -e INPUT_IGNORE_FAILURE=true -e INPUT_M2_HOME=/code -e INPUT_HOME=/code -e GITHUB_API_URL=${{ github.api_url }} -e GITHUB_REPOSITORY=${{ github.repository }} -e GITHUB_SHA=${{ github.sha }} -e INPUT_REPO_TOKEN=${{ github.token }} -w /code -u "$(id -u)" super-sast-action:1.0
 
     - uses: actions/upload-artifact@v3
       with:
