@@ -39,6 +39,11 @@ inputs:
     required: false
     default: "/code"
 
+  local:
+    description: "no requests"
+    required: false
+    default: false
+
 runs:
   using: "docker"
   image: "Dockerfile"
