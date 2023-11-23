@@ -19,7 +19,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - uses: DrPlumcake/super-sast-action@v0.95-beta
+    - uses: DrPlumcake/super-sast-action@v0.96-beta
       with:
         ignore_failure: true
         bandit_config_file: ".bandit.yaml"
