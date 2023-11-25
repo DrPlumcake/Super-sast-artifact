@@ -32,12 +32,12 @@ inputs:
   m2_home:
     description: "java validators will be installed in this directory"
     required: false
-    default: "/code"
+    default: "/github/workspace"
 
   home:
     description: ""
     required: false
-    default: "/code"
+    default: "/github/workspace"
 
   local:
     description: "no requests"
