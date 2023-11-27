@@ -40,7 +40,7 @@ inputs:
     default: "/github/workspace"
 
   local:
-    description: "no requests"
+    description: "Do not call github APIs. Just run tests locally."
     required: false
     default: false
 
