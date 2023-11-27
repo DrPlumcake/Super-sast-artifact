@@ -18,8 +18,8 @@ RUN chmod +x /entrypoint.sh
 RUN chmod +x /sast_to_log.py
 RUN chmod +x /main.py
 
-USER 1000
-
+# We are not setting USER because this image is only run on github.com.
+#   A similar approach is used in https://github.com/super-linter/super-linter/blob/main/Dockerfile
 # Since this is a job container, we don't need an healthcheck.
 HEALTHCHECK NONE
 ENTRYPOINT ["/entrypoint.sh"]

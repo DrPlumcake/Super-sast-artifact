@@ -1,0 +1,36 @@
+name: super-sast-action
+
+on: push
+
+jobs:
+  standard:
+    runs-on: ubuntu-latest
+
+    env:
+      GITHUB_API_URL: ${{ github.api_url }}
+      GITHUB_REPOSITORY: ${{ github.repository }}
+      GITHUB_SHA: ${{ github.sha }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ]
+        python-version: [ '3.7' ]
+    name: super-sast-action v0.9 ${{ matrix.python-version }} ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: DrPlumcake/super-sast-action@v0.98-beta
+      with:
+        ignore_failure: true
+        bandit_config_file: ".bandit.yaml"
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        m2_home: "/github/workspace"
+        home: "/github/workspace"
+        local: true
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: super-sast-action_artifact
+        path: |
+          super-sast.log
+          log_dir/

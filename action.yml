@@ -16,6 +16,7 @@ inputs:
     required: false
     default: false
 
+  # Is this still necessary?
   bandit_config_file:
     description: "The yaml config file to use"
     required: false
@@ -29,21 +30,23 @@ inputs:
     default: ${{ github.token }}
 
   m2_home:
-  description: "java validators will be installed in this directory"
-  required: false
-  default: "/code"
+    description: "java validators will be installed in this directory"
+    required: false
+    default: "/github/workspace"
 
   home:
-  description: ""
-  required: false
-  default: "/code"
+    description: ""
+    required: false
+    default: "/github/workspace"
+
+  local:
+    description: "Do not call github APIs. Just run tests locally."
+    required: false
+    default: false
 
 runs:
   using: "docker"
   image: "Dockerfile"
-  args:
-    - "-v $PWD:/code"
-    - "-w /code"
 
 branding:
   icon: "shield"

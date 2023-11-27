@@ -51,12 +51,14 @@ def checkov_results(log, github_sha=None, dummy=False):
 
     summary = f"""Total statistics:\n Check_Type: {check_type_0}\n{summary_0}\n\n Check_Type: {check_type_1}\n{summary_1}\n\n{url}"""
 
+    name = "Checkov Comments"
     if dummy:
         conclusion = "neutral"
         title = "Checkov dummy run (always neutral)"
+        name = "Checkov dummy run"
 
     results = {
-        "name": "Checkov Comments",
+        "name": name,
         "head_sha": github_sha,
         "completed_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "conclusion": conclusion,

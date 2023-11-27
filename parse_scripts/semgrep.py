@@ -78,15 +78,17 @@ def parse_data(log, github_sha=None, dummy=False):
     else:
         title.join("no errors found")
 
+    name = "Semgrep Comments"
     if dummy:
         conclusion = "neutral"
-        title = "Safety dummy run (always neutral)"
+        title = "Semgrep dummy run (always neutral)"
+        name = "Semgrep dummy run"
 
     text = None
     if "_comment" in log["paths"]:
         text = log["paths"]["_comment"]
     results = {
-        "name": "Semgrep Comments",
+        "name": name,
         "head_sha": github_sha,
         "completed_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "conclusion": conclusion,
